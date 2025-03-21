@@ -30,9 +30,9 @@ size_t PNGAPI
 png_get_rowbytes(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
-      return(info_ptr->rowbytes);
+      return(info_ptr->rowbytes);  // 16 pngget.c:33  // 13 pngget.c:33
 
-   return(0);
+   return(0);  // 16 pngget.c:35  // 13 pngget.c:35
 }
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED

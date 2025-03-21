@@ -619,7 +619,7 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
 
       else
       {
-         png_ptr->jmp_buf_ptr = png_voidcast(jmp_buf *,
+         png_ptr->jmp_buf_ptr = png_voidcast(jmp_buf *,  // 12 pngerror.c:622  // 15 pngerror.c:622
              png_malloc_warn(png_ptr, jmp_buf_size));
 
          if (png_ptr->jmp_buf_ptr == NULL)

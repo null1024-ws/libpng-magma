@@ -15,18 +15,20 @@
  */
 
 #include "pngpriv.h"
+#include <float.h>
+static long long expr_moran[2]; static long long low_moran[2]; static long long high_moran[2];
 
 #ifdef PNG_READ_SUPPORTED
 
 png_uint_32 PNGAPI
 png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
 {
-   png_uint_32 uval = png_get_uint_32(buf);
+   png_uint_32 uval = png_get_uint_32(buf);  // 15 pngrutil.c:24  // 6 pngrutil.c:24  // 16 pngrutil.c:24  // 13 pngrutil.c:24
 
    if (uval > PNG_UINT_31_MAX)
       png_error(png_ptr, "PNG unsigned integer out of range");
 
-   return (uval);
+   return (uval);  // 16 pngrutil.c:29  // 7 pngrutil.c:29  // 17 pngrutil.c:29  // 14 pngrutil.c:29
 }
 
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_READ_cHRM_SUPPORTED)
@@ -166,7 +168,7 @@ png_read_chunk_header(png_structrp png_ptr)
     * This must be performed in a single I/O call.
     */
    png_read_data(png_ptr, buf, 8);
-   length = png_get_uint_31(png_ptr, buf);
+   length = png_get_uint_31(png_ptr, buf);  // 8 pngrutil.c:169  // 18 pngrutil.c:169
 
    /* Put the chunk name into png_ptr->chunk_name. */
    png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
@@ -182,13 +184,13 @@ png_read_chunk_header(png_structrp png_ptr)
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
 
    /* Check for too-large chunk length */
-   png_check_chunk_length(png_ptr, length);
+   png_check_chunk_length(png_ptr, length);  // 9 pngrutil.c:185
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
 #endif
 
-   return length;
+   return length;  // 9 pngrutil.c:191  // 19 pngrutil.c:191
 }
 
 /* Read data, and (optionally) run it through the CRC. */
@@ -297,24 +299,24 @@ png_crc_error(png_structrp png_ptr)
 static png_bytep
 png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 {
-   png_bytep buffer = png_ptr->read_buffer;
+   png_bytep buffer = png_ptr->read_buffer;  // 10 pngrutil.c:300  // 13 pngrutil.c:300
 
    if (buffer != NULL && new_size > png_ptr->read_buffer_size)
    {
-      png_ptr->read_buffer = NULL;
+      png_ptr->read_buffer = NULL;  // 9 pngrutil.c:304  // 12 pngrutil.c:304
       png_ptr->read_buffer_size = 0;
       png_free(png_ptr, buffer);
-      buffer = NULL;
+      buffer = NULL;  // 10 pngrutil.c:307  // 13 pngrutil.c:307
    }
 
    if (buffer == NULL)
    {
-      buffer = png_voidcast(png_bytep, png_malloc_base(png_ptr, new_size));
+      buffer = png_voidcast(png_bytep, png_malloc_base(png_ptr, new_size));  // 13 pngrutil.c:312  // 16 pngrutil.c:312
 
       if (buffer != NULL)
       {
          memset(buffer, 0, new_size); /* just in case */
-         png_ptr->read_buffer = buffer;
+         png_ptr->read_buffer = buffer;  // 9 pngrutil.c:317  // 12 pngrutil.c:317
          png_ptr->read_buffer_size = new_size;
       }
 
@@ -328,7 +330,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
       }
    }
 
-   return buffer;
+   return buffer;  // 11 pngrutil.c:331  // 14 pngrutil.c:331
 }
 #endif /* READ_iCCP|iTXt|pCAL|sCAL|sPLT|tEXt|zTXt|SEQUENTIAL_READ */
 
@@ -398,7 +400,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
       png_ptr->zstream.next_in = NULL;
       png_ptr->zstream.avail_in = 0;
       png_ptr->zstream.next_out = NULL;
-      png_ptr->zstream.avail_out = 0;
+      png_ptr->zstream.avail_out = 0;  // 6 pngrutil.c:401  // 9 pngrutil.c:401
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
@@ -488,7 +490,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
    if (png_ptr->zowner == owner) /* Else not claimed */
    {
       int ret;
-      png_alloc_size_t avail_out = *output_size_ptr;
+      png_alloc_size_t avail_out = *output_size_ptr;  // 6 pngrutil.c:491  // 9 pngrutil.c:491
       png_uint_32 avail_in = *input_size_ptr;
 
       /* zlib can't necessarily handle more than 65535 bytes at once (i.e. it
@@ -503,7 +505,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
       png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
       /* avail_in and avail_out are set below from 'size' */
       png_ptr->zstream.avail_in = 0;
-      png_ptr->zstream.avail_out = 0;
+      png_ptr->zstream.avail_out = 0;  // 7 pngrutil.c:506  // 10 pngrutil.c:506
 
       /* Read directly into the output if it is available (this is set to
        * a local buffer below if output is NULL).
@@ -535,9 +537,9 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
          png_ptr->zstream.avail_in = avail;
 
          /* zlib OUTPUT BUFFER */
-         avail_out += png_ptr->zstream.avail_out; /* not written last time */
+         avail_out += png_ptr->zstream.avail_out; /* not written last time */  // 7 pngrutil.c:538  // 10 pngrutil.c:538
 
-         avail = ZLIB_IO_MAX; /* maximum zlib can process */
+         avail = ZLIB_IO_MAX; /* maximum zlib can process */  // 7 pngrutil.c:540  // 10 pngrutil.c:540
 
          if (output == NULL)
          {
@@ -546,14 +548,14 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
              */
             png_ptr->zstream.next_out = local_buffer;
             if ((sizeof local_buffer) < avail)
-               avail = (sizeof local_buffer);
+               avail = (sizeof local_buffer);  // 7 pngrutil.c:549  // 10 pngrutil.c:549
          }
 
          if (avail_out < avail)
-            avail = (uInt)avail_out; /* safe: < ZLIB_IO_MAX */
+            avail = (uInt)avail_out; /* safe: < ZLIB_IO_MAX */  // 7 pngrutil.c:553  // 10 pngrutil.c:553
 
-         png_ptr->zstream.avail_out = avail;
-         avail_out -= avail;
+         png_ptr->zstream.avail_out = avail;  // 8 pngrutil.c:555  // 11 pngrutil.c:555
+         avail_out -= avail;  // 8 pngrutil.c:556  // 11 pngrutil.c:556
 
          /* zlib inflate call */
          /* In fact 'avail_out' may be 0 at this point, that happens at the end
@@ -571,13 +573,13 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
 
       /* Claw back the 'size' and 'remaining_space' byte counts. */
       avail_in += png_ptr->zstream.avail_in;
-      avail_out += png_ptr->zstream.avail_out;
+      avail_out += png_ptr->zstream.avail_out;  // 9 pngrutil.c:574  // 12 pngrutil.c:574
 
       /* Update the input and output sizes; the updated values are the amount
        * consumed or written, effectively the inverse of what zlib uses.
        */
       if (avail_out > 0)
-         *output_size_ptr -= avail_out;
+         *output_size_ptr -= avail_out;  // 10 pngrutil.c:580  // 13 pngrutil.c:580
 
       if (avail_in > 0)
          *input_size_ptr -= avail_in;
@@ -618,12 +620,12 @@ png_decompress_chunk(png_structrp png_ptr,
     * maybe a '\0' terminator too.  We have to assume that 'prefix_size' is
     * limited only by the maximum chunk size.
     */
-   png_alloc_size_t limit = PNG_SIZE_MAX;
+   png_alloc_size_t limit = PNG_SIZE_MAX;  // 8 pngrutil.c:621  // 11 pngrutil.c:621
 
 # ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_malloc_max > 0 &&
        png_ptr->user_chunk_malloc_max < limit)
-      limit = png_ptr->user_chunk_malloc_max;
+      limit = png_ptr->user_chunk_malloc_max;  // 8 pngrutil.c:626  // 11 pngrutil.c:626
 # elif PNG_USER_CHUNK_MALLOC_MAX > 0
    if (PNG_USER_CHUNK_MALLOC_MAX < limit)
       limit = PNG_USER_CHUNK_MALLOC_MAX;
@@ -633,10 +635,10 @@ png_decompress_chunk(png_structrp png_ptr,
    {
       int ret;
 
-      limit -= prefix_size + (terminate != 0);
+      limit -= prefix_size + (terminate != 0);  // 9 pngrutil.c:636  // 12 pngrutil.c:636
 
       if (limit < *newlength)
-         *newlength = limit;
+         *newlength = limit;  // 10 pngrutil.c:639  // 13 pngrutil.c:639
 
       /* Now try to claim the stream. */
       ret = png_inflate_claim(png_ptr, png_ptr->chunk_name);
@@ -665,10 +667,10 @@ png_decompress_chunk(png_structrp png_ptr,
                 * png_alloc_size_t).  Use png_malloc_base here to avoid an
                 * extra OOM message.
                 */
-               png_alloc_size_t new_size = *newlength;
-               png_alloc_size_t buffer_size = prefix_size + new_size +
+               png_alloc_size_t new_size = *newlength;  // 11 pngrutil.c:668  // 14 pngrutil.c:668
+               png_alloc_size_t buffer_size = prefix_size + new_size +  // 12 pngrutil.c:669  // 15 pngrutil.c:669
                    (terminate != 0);
-               png_bytep text = png_voidcast(png_bytep, png_malloc_base(png_ptr,
+               png_bytep text = png_voidcast(png_bytep, png_malloc_base(png_ptr,  // 13 pngrutil.c:671  // 16 pngrutil.c:671
                    buffer_size));
 
                if (text != NULL)
@@ -684,15 +686,15 @@ png_decompress_chunk(png_structrp png_ptr,
                      if (new_size == *newlength)
                      {
                         if (terminate != 0)
-                           text[prefix_size + *newlength] = 0;
+                           text[prefix_size + *newlength] = 0;  // 19 pngrutil.c:687
 
                         if (prefix_size > 0)
-                           memcpy(text, png_ptr->read_buffer, prefix_size);
+                           memcpy(text, png_ptr->read_buffer, prefix_size);  // 19 pngrutil.c:690
 
                         {
                            png_bytep old_ptr = png_ptr->read_buffer;
 
-                           png_ptr->read_buffer = text;
+                           png_ptr->read_buffer = text;  // 9 pngrutil.c:695  // 12 pngrutil.c:695
                            png_ptr->read_buffer_size = buffer_size;
                            text = old_ptr; /* freed below */
                         }
@@ -780,7 +782,7 @@ png_inflate_read(png_structrp png_ptr, png_bytep read_buffer, uInt read_size,
 
       /* next_in and avail_in must have been initialized by the caller. */
       png_ptr->zstream.next_out = next_out;
-      png_ptr->zstream.avail_out = 0; /* set in the loop */
+      png_ptr->zstream.avail_out = 0; /* set in the loop */  // 4 pngrutil.c:783  // 7 pngrutil.c:783
 
       do
       {
@@ -799,12 +801,12 @@ png_inflate_read(png_structrp png_ptr, png_bytep read_buffer, uInt read_size,
 
          if (png_ptr->zstream.avail_out == 0)
          {
-            uInt avail = ZLIB_IO_MAX;
+            uInt avail = ZLIB_IO_MAX;  // 3 pngrutil.c:802  // 6 pngrutil.c:802
             if (avail > *out_size)
-               avail = (uInt)*out_size;
-            *out_size -= avail;
+               avail = (uInt)*out_size;  // 3 pngrutil.c:804  // 6 pngrutil.c:804
+            *out_size -= avail;  // 2 pngrutil.c:805  // 5 pngrutil.c:805
 
-            png_ptr->zstream.avail_out = avail;
+            png_ptr->zstream.avail_out = avail;  // 4 pngrutil.c:807  // 7 pngrutil.c:807
          }
 
          /* Use Z_SYNC_FLUSH when there is no more chunk data to ensure that all
@@ -817,7 +819,7 @@ png_inflate_read(png_structrp png_ptr, png_bytep read_buffer, uInt read_size,
       while (ret == Z_OK && (*out_size > 0 || png_ptr->zstream.avail_out > 0));
 
       *out_size += png_ptr->zstream.avail_out;
-      png_ptr->zstream.avail_out = 0; /* Should not be required, but is safe */
+      png_ptr->zstream.avail_out = 0; /* Should not be required, but is safe */  // 5 pngrutil.c:820  // 8 pngrutil.c:820
 
       /* Ensure the error message pointer is always set: */
       png_zstream_error(png_ptr, ret);
@@ -856,18 +858,18 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_crc_read(png_ptr, buf, 13);
    png_crc_finish(png_ptr, 0);
 
-   width = png_get_uint_31(png_ptr, buf);
-   height = png_get_uint_31(png_ptr, buf + 4);
-   bit_depth = buf[8];
+   width = png_get_uint_31(png_ptr, buf);  // 17 pngrutil.c:859  // 15 pngrutil.c:859
+   height = png_get_uint_31(png_ptr, buf + 4);  // 8 pngrutil.c:860
+   bit_depth = buf[8];  // 15 pngrutil.c:861  // 18 pngrutil.c:861
    color_type = buf[9];
    compression_type = buf[10];
    filter_type = buf[11];
    interlace_type = buf[12];
 
    /* Set internal variables */
-   png_ptr->width = width;
-   png_ptr->height = height;
-   png_ptr->bit_depth = (png_byte)bit_depth;
+   png_ptr->width = width;  // 18 pngrutil.c:868  // 16 pngrutil.c:868
+   png_ptr->height = height;  // 9 pngrutil.c:869
+   png_ptr->bit_depth = (png_byte)bit_depth;  // 16 pngrutil.c:870  // 19 pngrutil.c:870
    png_ptr->interlaced = (png_byte)interlace_type;
    png_ptr->color_type = (png_byte)color_type;
 #ifdef PNG_MNG_FEATURES_SUPPORTED
@@ -881,29 +883,29 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       default: /* invalid, png_set_IHDR calls png_error */
       case PNG_COLOR_TYPE_GRAY:
       case PNG_COLOR_TYPE_PALETTE:
-         png_ptr->channels = 1;
+         png_ptr->channels = 1;  // 15 pngrutil.c:884  // 8 pngrutil.c:884  // 13 pngrutil.c:884
          break;
 
       case PNG_COLOR_TYPE_RGB:
-         png_ptr->channels = 3;
+         png_ptr->channels = 3;  // 15 pngrutil.c:888  // 8 pngrutil.c:888  // 13 pngrutil.c:888
          break;
 
       case PNG_COLOR_TYPE_GRAY_ALPHA:
-         png_ptr->channels = 2;
+         png_ptr->channels = 2;  // 15 pngrutil.c:892  // 8 pngrutil.c:892  // 13 pngrutil.c:892
          break;
 
       case PNG_COLOR_TYPE_RGB_ALPHA:
-         png_ptr->channels = 4;
+         png_ptr->channels = 4;  // 15 pngrutil.c:896  // 8 pngrutil.c:896  // 13 pngrutil.c:896
          break;
    }
 
    /* Set up other useful info */
-   png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth * png_ptr->channels);
+   png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth * png_ptr->channels);  // 16 pngrutil.c:901  // 14 pngrutil.c:901
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->width);
    png_debug1(3, "bit_depth = %d", png_ptr->bit_depth);
    png_debug1(3, "channels = %d", png_ptr->channels);
    png_debug1(3, "rowbytes = %lu", (unsigned long)png_ptr->rowbytes);
-   png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
+   png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,  // 14 pngrutil.c:906  // 11 pngrutil.c:906
        color_type, interlace_type, compression_type, filter_type);
 }
 
@@ -911,7 +913,7 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_color palette[PNG_MAX_PALETTE_LENGTH];
+   png_color palette[PNG_MAX_PALETTE_LENGTH];  // 18 pngrutil.c:914  // 22 pngrutil.c:914
    int max_palette_length, num, i;
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_colorp pal_ptr;
@@ -942,7 +944,10 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    png_ptr->mode |= PNG_HAVE_PLTE;
 
-   if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0)
+expr_moran[0] = ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0), low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "ignored in grayscale PNG");
@@ -950,14 +955,20 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
-   if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
+expr_moran[0] = (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE), low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
       return;
    }
 #endif
 
-   if (length > 3*PNG_MAX_PALETTE_LENGTH || length % 3)
+expr_moran[0] = length > 3 * PNG_MAX_PALETTE_LENGTH || length % 3, low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(303, 1, 0, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
 
@@ -971,7 +982,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    /* The cast is safe because 'length' is less than 3*PNG_MAX_PALETTE_LENGTH */
-   num = (int)length / 3;
+   num = (int)length / 3;  // 21 pngrutil.c:974
 
    /* If the palette has 256 or fewer entries but is too large for the bit
     * depth, we don't issue an error, to preserve the behavior of previous
@@ -979,12 +990,12 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * here.
     */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      max_palette_length = (1 << png_ptr->bit_depth);
+      max_palette_length = (1 << png_ptr->bit_depth);  // 20 pngrutil.c:982
    else
-      max_palette_length = PNG_MAX_PALETTE_LENGTH;
+      max_palette_length = PNG_MAX_PALETTE_LENGTH;  // 20 pngrutil.c:984
 
    if (num > max_palette_length)
-      num = max_palette_length;
+      num = max_palette_length;  // 21 pngrutil.c:987
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
@@ -1056,7 +1067,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     *
     * Fix this by not sharing the palette in this way.
     */
-   png_set_PLTE(png_ptr, info_ptr, palette, num);
+   png_set_PLTE(png_ptr, info_ptr, palette, num);  // 22 pngrutil.c:1059
 
    /* The three chunks, bKGD, hIST and tRNS *must* appear after PLTE and before
     * IDAT.  Prior to 1.6.0 this was not checked; instead the code merely
@@ -1182,13 +1193,13 @@ png_handle_sBIT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
       truelen = 3;
-      sample_depth = 8;
+      sample_depth = 8;  // 17 pngrutil.c:1185  // 15 pngrutil.c:1185
    }
 
    else
    {
       truelen = png_ptr->channels;
-      sample_depth = png_ptr->bit_depth;
+      sample_depth = png_ptr->bit_depth;  // 17 pngrutil.c:1191  // 15 pngrutil.c:1191
    }
 
    if (length != truelen || length > 4)
@@ -1198,7 +1209,7 @@ png_handle_sBIT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   buf[0] = buf[1] = buf[2] = buf[3] = sample_depth;
+   buf[0] = buf[1] = buf[2] = buf[3] = sample_depth;  // 18 pngrutil.c:1201  // 16 pngrutil.c:1201
    png_crc_read(png_ptr, buf, truelen);
 
    if (png_crc_finish(png_ptr, 0) != 0)
@@ -1215,18 +1226,18 @@ png_handle_sBIT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
-      png_ptr->sig_bit.red = buf[0];
-      png_ptr->sig_bit.green = buf[1];
-      png_ptr->sig_bit.blue = buf[2];
+      png_ptr->sig_bit.red = buf[0];  // 15 pngrutil.c:1218  // 14 pngrutil.c:1218
+      png_ptr->sig_bit.green = buf[1];  // 14 pngrutil.c:1219
+      png_ptr->sig_bit.blue = buf[2];  // 14 pngrutil.c:1220  // 17 pngrutil.c:1220
       png_ptr->sig_bit.alpha = buf[3];
    }
 
    else
    {
-      png_ptr->sig_bit.gray = buf[0];
-      png_ptr->sig_bit.red = buf[0];
-      png_ptr->sig_bit.green = buf[0];
-      png_ptr->sig_bit.blue = buf[0];
+      png_ptr->sig_bit.gray = buf[0];  // 12 pngrutil.c:1226  // 14 pngrutil.c:1226
+      png_ptr->sig_bit.red = buf[0];  // 15 pngrutil.c:1227  // 14 pngrutil.c:1227
+      png_ptr->sig_bit.green = buf[0];  // 14 pngrutil.c:1228
+      png_ptr->sig_bit.blue = buf[0];  // 14 pngrutil.c:1229  // 17 pngrutil.c:1229
       png_ptr->sig_bit.alpha = buf[1];
    }
 
@@ -1428,10 +1439,10 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
          return;
       }
 
-      keyword_length = 0;
+      keyword_length = 0;  // 12 pngrutil.c:1431  // 15 pngrutil.c:1431
       while (keyword_length < 80 && keyword_length < read_length &&
          keyword[keyword_length] != 0)
-         ++keyword_length;
+         ++keyword_length;  // 12 pngrutil.c:1434  // 15 pngrutil.c:1434
 
       /* TODO: make the keyword checking common */
       if (keyword_length >= 1 && keyword_length <= 79)
@@ -1446,9 +1457,9 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
             if (png_inflate_claim(png_ptr, png_iCCP) == Z_OK)
             {
-               Byte profile_header[132]={0};
+               Byte profile_header[132]={0};  // 18 pngrutil.c:1449  // 13 pngrutil.c:1449
                Byte local_buffer[PNG_INFLATE_BUF_SIZE];
-               png_alloc_size_t size = (sizeof profile_header);
+               png_alloc_size_t size = (sizeof profile_header);  // 2 pngrutil.c:1451  // 5 pngrutil.c:1451
 
                png_ptr->zstream.next_in = (Bytef*)keyword + (keyword_length+2);
                png_ptr->zstream.avail_in = read_length;
@@ -1460,7 +1471,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                {
                   /* We have the ICC profile header; do the basic header checks.
                    */
-                  png_uint_32 profile_length = png_get_uint_32(profile_header);
+                  png_uint_32 profile_length = png_get_uint_32(profile_header);  // 11 pngrutil.c:1463  // 14 pngrutil.c:1463
 
                   if (png_icc_check_length(png_ptr, &png_ptr->colorspace,
                       keyword, profile_length) != 0)
@@ -1477,17 +1488,17 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                          * profile.  The header check has already validated
                          * that none of this stuff will overflow.
                          */
-                        png_uint_32 tag_count =
+                        png_uint_32 tag_count =  // 1 pngrutil.c:1480  // 4 pngrutil.c:1480
                            png_get_uint_32(profile_header + 128);
-                        png_bytep profile = png_read_buffer(png_ptr,
+                        png_bytep profile = png_read_buffer(png_ptr,  // 12 pngrutil.c:1482  // 15 pngrutil.c:1482
                             profile_length, 2/*silent*/);
 
                         if (profile != NULL)
                         {
-                           memcpy(profile, profile_header,
+                           memcpy(profile, profile_header,  // 19 pngrutil.c:1487
                                (sizeof profile_header));
 
-                           size = 12 * tag_count;
+                           size = 12 * tag_count;  // 2 pngrutil.c:1490  // 5 pngrutil.c:1490
 
                            (void)png_inflate_read(png_ptr, local_buffer,
                                (sizeof local_buffer), &length,
@@ -1505,7 +1516,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                  /* The profile has been validated for basic
                                   * security issues, so read the whole thing in.
                                   */
-                                 size = profile_length - (sizeof profile_header)
+                                 size = profile_length - (sizeof profile_header)  // 2 pngrutil.c:1508  // 5 pngrutil.c:1508
                                      - 12 * tag_count;
 
                                  (void)png_inflate_read(png_ptr, local_buffer,
@@ -1545,17 +1556,17 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                        png_free_data(png_ptr, info_ptr,
                                            PNG_FREE_ICCP, 0);
 
-                                       info_ptr->iccp_name = png_voidcast(char*,
+                                       info_ptr->iccp_name = png_voidcast(char*,  // 13 pngrutil.c:1548  // 16 pngrutil.c:1548
                                            png_malloc_base(png_ptr,
                                            keyword_length+1));
                                        if (info_ptr->iccp_name != NULL)
                                        {
-                                          memcpy(info_ptr->iccp_name, keyword,
+                                          memcpy(info_ptr->iccp_name, keyword,  // 19 pngrutil.c:1553
                                               keyword_length+1);
                                           info_ptr->iccp_proflen =
                                               profile_length;
                                           info_ptr->iccp_profile = profile;
-                                          png_ptr->read_buffer = NULL; /*steal*/
+                                          png_ptr->read_buffer = NULL; /*steal*/  // 9 pngrutil.c:1558  // 12 pngrutil.c:1558
                                           info_ptr->free_me |= PNG_FREE_ICCP;
                                           info_ptr->valid |= PNG_INFO_iCCP;
                                        }
@@ -1687,7 +1698,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);  // 12 pngrutil.c:1690  // 15 pngrutil.c:1690
    if (buffer == NULL)
    {
       png_crc_finish(png_ptr, length);
@@ -1705,12 +1716,12 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, skip) != 0)
       return;
 
-   buffer[length] = 0;
+   buffer[length] = 0;  // 19 pngrutil.c:1708
 
-   for (entry_start = buffer; *entry_start; entry_start++)
+   for (entry_start = buffer; *entry_start; entry_start++)  // 7 pngrutil.c:1710  // 10 pngrutil.c:1710
       /* Empty loop to find end of name */ ;
 
-   ++entry_start;
+   ++entry_start;  // 8 pngrutil.c:1713  // 11 pngrutil.c:1713
 
    /* A sample depth should follow the separator, and we should be on it  */
    if (length < 2U || entry_start > buffer + (length - 2U))
@@ -1719,12 +1730,12 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   new_palette.depth = *entry_start++;
-   entry_size = (new_palette.depth == 8 ? 6 : 10);
+   new_palette.depth = *entry_start++;  // 9 pngrutil.c:1722  // 12 pngrutil.c:1722
+   entry_size = (new_palette.depth == 8 ? 6 : 10);  // 10 pngrutil.c:1723  // 13 pngrutil.c:1723
    /* This must fit in a png_uint_32 because it is derived from the original
     * chunk data length.
     */
-   data_length = length - (png_uint_32)(entry_start - buffer);
+   data_length = length - (png_uint_32)(entry_start - buffer);  // 10 pngrutil.c:1727  // 13 pngrutil.c:1727
 
    /* Integrity-check the data length */
    if ((data_length % (unsigned int)entry_size) != 0)
@@ -1742,9 +1753,9 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   new_palette.nentries = (png_int_32)(data_length / (unsigned int)entry_size);
+   new_palette.nentries = (png_int_32)(data_length / (unsigned int)entry_size);  // 11 pngrutil.c:1745  // 14 pngrutil.c:1745
 
-   new_palette.entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
+   new_palette.entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,  // 12 pngrutil.c:1747  // 15 pngrutil.c:1747
        (png_alloc_size_t) new_palette.nentries * (sizeof (png_sPLT_entry)));
 
    if (new_palette.entries == NULL)
@@ -2060,7 +2071,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    info_ptr->free_me |= PNG_FREE_EXIF;
 
-   info_ptr->eXIf_buf = png_voidcast(png_bytep,
+   info_ptr->eXIf_buf = png_voidcast(png_bytep,  // 12 pngrutil.c:2063  // 15 pngrutil.c:2063
              png_malloc_warn(png_ptr, length));
 
    if (info_ptr->eXIf_buf == NULL)
@@ -2074,7 +2085,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    {
       png_byte buf[1];
       png_crc_read(png_ptr, buf, 1);
-      info_ptr->eXIf_buf[i] = buf[0];
+      info_ptr->eXIf_buf[i] = buf[0];  // 19 pngrutil.c:2077
       if (i == 1 && buf[0] != 'M' && buf[0] != 'I'
                  && info_ptr->eXIf_buf[0] != buf[0])
       {
@@ -2087,7 +2098,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    if (png_crc_finish(png_ptr, 0) == 0)
-      png_set_eXIf_1(png_ptr, info_ptr, length, info_ptr->eXIf_buf);
+      png_set_eXIf_1(png_ptr, info_ptr, length, info_ptr->eXIf_buf);  // 10 pngrutil.c:2090  // 13 pngrutil.c:2090
 
    png_free(png_ptr, info_ptr->eXIf_buf);
    info_ptr->eXIf_buf = NULL;
@@ -2271,7 +2282,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_debug1(2, "Allocating and reading pCAL chunk data (%u bytes)",
        length + 1);
 
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);  // 12 pngrutil.c:2274  // 15 pngrutil.c:2274
 
    if (buffer == NULL)
    {
@@ -2285,7 +2296,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0) != 0)
       return;
 
-   buffer[length] = 0; /* Null terminate the last string */
+   buffer[length] = 0; /* Null terminate the last string */  // 19 pngrutil.c:2288
 
    png_debug(3, "Finding end of pCAL purpose string");
    for (buf = buffer; *buf; buf++)
@@ -2406,7 +2417,7 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_debug1(2, "Allocating and reading sCAL chunk data (%u bytes)",
        length + 1);
 
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);  // 12 pngrutil.c:2409  // 15 pngrutil.c:2409
 
    if (buffer == NULL)
    {
@@ -2416,7 +2427,7 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    png_crc_read(png_ptr, buffer, length);
-   buffer[length] = 0; /* Null terminate the last string */
+   buffer[length] = 0; /* Null terminate the last string */  // 19 pngrutil.c:2419
 
    if (png_crc_finish(png_ptr, 0) != 0)
       return;
@@ -2552,7 +2563,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);
+   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);  // 12 pngrutil.c:2555  // 15 pngrutil.c:2555
 
    if (buffer == NULL)
    {
@@ -2566,7 +2577,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
 
    key = (png_charp)buffer;
-   key[length] = 0;
+   key[length] = 0;  // 19 pngrutil.c:2569
 
    for (text = key; *text; text++)
       /* Empty loop to find end of key */ ;
@@ -2625,7 +2636,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    /* Note, "length" is sufficient here; we won't be adding
     * a null terminator later.
     */
-   buffer = png_read_buffer(png_ptr, length, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length, 2/*silent*/);  // 12 pngrutil.c:2628  // 15 pngrutil.c:2628
 
    if (buffer == NULL)
    {
@@ -2640,7 +2651,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
 
    /* TODO: also check that the keyword contents match the spec! */
-   for (keyword_length = 0;
+   for (keyword_length = 0;  // 10 pngrutil.c:2643  // 13 pngrutil.c:2643
       keyword_length < length && buffer[keyword_length] != 0;
       ++keyword_length)
       /* Empty loop to find end of name */ ;
@@ -2660,13 +2671,13 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    else
    {
-      png_alloc_size_t uncompressed_length = PNG_SIZE_MAX;
+      png_alloc_size_t uncompressed_length = PNG_SIZE_MAX;  // 10 pngrutil.c:2663  // 13 pngrutil.c:2663
 
       /* TODO: at present png_decompress_chunk imposes a single application
        * level memory limit, this should be split to different values for iCCP
        * and text chunks.
        */
-      if (png_decompress_chunk(png_ptr, length, keyword_length+2,
+      if (png_decompress_chunk(png_ptr, length, keyword_length+2,  // 11 pngrutil.c:2669  // 14 pngrutil.c:2669
           &uncompressed_length, 1/*terminate*/) == Z_STREAM_END)
       {
          png_text text;
@@ -2680,7 +2691,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
              * it isn't necessarily '\0' terminated.
              */
             buffer = png_ptr->read_buffer;
-            buffer[uncompressed_length+(keyword_length+2)] = 0;
+            buffer[uncompressed_length+(keyword_length+2)] = 0;  // 19 pngrutil.c:2683
 
             text.compression = PNG_TEXT_COMPRESSION_zTXt;
             text.key = (png_charp)buffer;
@@ -2739,7 +2750,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
-   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);
+   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);  // 12 pngrutil.c:2742  // 15 pngrutil.c:2742
 
    if (buffer == NULL)
    {
@@ -2754,7 +2765,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
 
    /* First the keyword. */
-   for (prefix_length=0;
+   for (prefix_length=0;  // 7 pngrutil.c:2757  // 10 pngrutil.c:2757
       prefix_length < length && buffer[prefix_length] != 0;
       ++prefix_length)
       /* Empty loop */ ;
@@ -2776,20 +2787,20 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    {
       int compressed = buffer[prefix_length+1] != 0;
       png_uint_32 language_offset, translated_keyword_offset;
-      png_alloc_size_t uncompressed_length = 0;
+      png_alloc_size_t uncompressed_length = 0;  // 10 pngrutil.c:2779  // 13 pngrutil.c:2779
 
       /* Now the language tag */
-      prefix_length += 3;
+      prefix_length += 3;  // 8 pngrutil.c:2782  // 11 pngrutil.c:2782
       language_offset = prefix_length;
 
-      for (; prefix_length < length && buffer[prefix_length] != 0;
+      for (; prefix_length < length && buffer[prefix_length] != 0;  // 8 pngrutil.c:2785  // 11 pngrutil.c:2785
          ++prefix_length)
          /* Empty loop */ ;
 
       /* WARNING: the length may be invalid here, this is checked below. */
-      translated_keyword_offset = ++prefix_length;
+      translated_keyword_offset = ++prefix_length;  // 9 pngrutil.c:2790  // 12 pngrutil.c:2790
 
-      for (; prefix_length < length && buffer[prefix_length] != 0;
+      for (; prefix_length < length && buffer[prefix_length] != 0;  // 9 pngrutil.c:2792  // 12 pngrutil.c:2792
          ++prefix_length)
          /* Empty loop */ ;
 
@@ -2798,20 +2809,20 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
        * can overflow because chunks are at most 2^31 bytes long, but on 16-bit
        * systems the available allocation may overflow.
        */
-      ++prefix_length;
+      ++prefix_length;  // 10 pngrutil.c:2801  // 13 pngrutil.c:2801
 
       if (compressed == 0 && prefix_length <= length)
-         uncompressed_length = length - prefix_length;
+         uncompressed_length = length - prefix_length;  // 10 pngrutil.c:2804  // 13 pngrutil.c:2804
 
       else if (compressed != 0 && prefix_length < length)
       {
-         uncompressed_length = PNG_SIZE_MAX;
+         uncompressed_length = PNG_SIZE_MAX;  // 10 pngrutil.c:2808  // 13 pngrutil.c:2808
 
          /* TODO: at present png_decompress_chunk imposes a single application
           * level memory limit, this should be split to different values for
           * iCCP and text chunks.
           */
-         if (png_decompress_chunk(png_ptr, length, prefix_length,
+         if (png_decompress_chunk(png_ptr, length, prefix_length,  // 11 pngrutil.c:2814  // 14 pngrutil.c:2814
              &uncompressed_length, 1/*terminate*/) == Z_STREAM_END)
             buffer = png_ptr->read_buffer;
 
@@ -2826,7 +2837,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       {
          png_text text;
 
-         buffer[uncompressed_length+prefix_length] = 0;
+         buffer[uncompressed_length+prefix_length] = 0;  // 19 pngrutil.c:2829
 
          if (compressed == 0)
             text.compression = PNG_ITXT_COMPRESSION_NONE;
@@ -2881,7 +2892,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
    {
       PNG_CSTRING_FROM_CHUNK(png_ptr->unknown_chunk.name, png_ptr->chunk_name);
       /* The following is safe because of the PNG_SIZE_MAX init above */
-      png_ptr->unknown_chunk.size = (size_t)length/*SAFE*/;
+      png_ptr->unknown_chunk.size = (size_t)length/*SAFE*/;  // 12 pngrutil.c:2884  // 15 pngrutil.c:2884
       /* 'mode' is a flag array, only the bottom four bits matter here */
       png_ptr->unknown_chunk.location = (png_byte)png_ptr->mode/*SAFE*/;
 
@@ -2891,7 +2902,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       else
       {
          /* Do a 'warn' here - it is handled below. */
-         png_ptr->unknown_chunk.data = png_voidcast(png_bytep,
+         png_ptr->unknown_chunk.data = png_voidcast(png_bytep,  // 12 pngrutil.c:2894  // 15 pngrutil.c:2894
              png_malloc_warn(png_ptr, length));
       }
    }
@@ -2951,7 +2962,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
     */
    if (png_ptr->read_user_chunk_fn != NULL)
    {
-      if (png_cache_unknown_chunk(png_ptr, length) != 0)
+      if (png_cache_unknown_chunk(png_ptr, length) != 0)  // 11 pngrutil.c:2954  // 14 pngrutil.c:2954
       {
          /* Callback to user unknown chunk handler */
          int ret = (*(png_ptr->read_user_chunk_fn))(png_ptr,
@@ -3028,7 +3039,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
           PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
       {
-         if (png_cache_unknown_chunk(png_ptr, length) == 0)
+         if (png_cache_unknown_chunk(png_ptr, length) == 0)  // 11 pngrutil.c:3031  // 14 pngrutil.c:3031
             keep = PNG_HANDLE_CHUNK_NEVER;
       }
 
@@ -3159,16 +3170,19 @@ png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
    if (PNG_USER_CHUNK_MALLOC_MAX < limit)
       limit = PNG_USER_CHUNK_MALLOC_MAX;
 # endif
-   if (png_ptr->chunk_name == png_IDAT)
+expr_moran[0] = (png_ptr->chunk_name == png_IDAT), low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       png_alloc_size_t idat_limit = PNG_UINT_31_MAX;
-      size_t row_factor =
+      size_t row_factor =  // 9 pngrutil.c:3165
          (size_t)png_ptr->width
          * (size_t)png_ptr->channels
          * (png_ptr->bit_depth > 8? 2: 1)
          + 1
          + (png_ptr->interlaced? 6: 0);
-      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
+      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)  // 10 pngrutil.c:3171
          idat_limit = PNG_UINT_31_MAX;
       else
          idat_limit = png_ptr->height * row_factor;
@@ -3196,12 +3210,12 @@ png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 {
-   unsigned int pixel_depth = png_ptr->transformed_pixel_depth;
-   png_const_bytep sp = png_ptr->row_buf + 1;
-   png_alloc_size_t row_width = png_ptr->width;
+   unsigned int pixel_depth = png_ptr->transformed_pixel_depth;  // 19 pngrutil.c:3199  // 17 pngrutil.c:3199
+   png_const_bytep sp = png_ptr->row_buf + 1;  // 19 pngrutil.c:3200
+   png_alloc_size_t row_width = png_ptr->width;  // 19 pngrutil.c:3201  // 17 pngrutil.c:3201
    unsigned int pass = png_ptr->pass;
    png_bytep end_ptr = 0;
-   png_byte end_byte = 0;
+   png_byte end_byte = 0;  // 18 pngrutil.c:3204
    unsigned int end_mask;
 
    png_debug(1, "in png_combine_row");
@@ -3228,20 +3242,20 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     * the multiply below may overflow, we don't care because ANSI-C guarantees
     * we get the low bits.
     */
-   end_mask = (pixel_depth * row_width) & 7;
+   end_mask = (pixel_depth * row_width) & 7;  // 18 pngrutil.c:3231
    if (end_mask != 0)
    {
       /* end_ptr == NULL is a flag to say do nothing */
       end_ptr = dp + PNG_ROWBYTES(pixel_depth, row_width) - 1;
-      end_byte = *end_ptr;
+      end_byte = *end_ptr;  // 18 pngrutil.c:3236
 #     ifdef PNG_READ_PACKSWAP_SUPPORTED
       if ((png_ptr->transformations & PNG_PACKSWAP) != 0)
          /* little-endian byte */
-         end_mask = (unsigned int)(0xff << end_mask);
+         end_mask = (unsigned int)(0xff << end_mask);  // 18 pngrutil.c:3240
 
       else /* big-endian byte */
 #     endif
-      end_mask = 0xff >> end_mask;
+      end_mask = 0xff >> end_mask;  // 18 pngrutil.c:3244
       /* end_mask is now the bits to *keep* from the destination row */
    }
 
@@ -3261,10 +3275,16 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
       /* Narrow images may have no bits in a pass; the caller should handle
        * this, but this test is cheap:
        */
-      if (row_width <= PNG_PASS_START_COL(pass))
+expr_moran[0] = row_width, low_moran[0] = DBL_MIN, high_moran[0] = PNG_PASS_START_COL(pass);
+      expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 1);
+if (expr_moran[0] <= high_moran[0])
          return;
 
-      if (pixel_depth < 8)
+expr_moran[0] = pixel_depth, low_moran[0] = DBL_MIN, high_moran[0] = 8;
+      expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+      mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 1);
+      if (expr_moran[0] < high_moran[0])
       {
          /* For pixel depths up to 4 bpp the 8-pixel mask can be expanded to fit
           * into 32 bits, then a single loop over the bytes using the four byte
@@ -3359,7 +3379,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* Hence the pre-compiled masks indexed by PACKSWAP (or not), depth and
           * then pass:
           */
-         static const png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
+         static const png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =  // 15 pngrutil.c:3362
          {
             /* Little-endian byte masks for PACKSWAP */
             { S_MASKS(1,0), S_MASKS(2,0), S_MASKS(4,0) },
@@ -3370,7 +3390,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* display_mask has only three entries for the odd passes, so index by
           * pass>>1.
           */
-         static const png_uint_32 display_mask[2][3][3] =
+         static const png_uint_32 display_mask[2][3][3] =  // 15 pngrutil.c:3373
          {
             /* Little-endian byte masks for PACKSWAP */
             { B_MASKS(1,0), B_MASKS(2,0), B_MASKS(4,0) },
@@ -3400,11 +3420,11 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 
 #        ifdef PNG_READ_PACKSWAP_SUPPORTED
          if ((png_ptr->transformations & PNG_PACKSWAP) != 0)
-            mask = MASK(pass, pixel_depth, display, 0);
+            mask = MASK(pass, pixel_depth, display, 0);  // 16 pngrutil.c:3403
 
          else
 #        endif
-         mask = MASK(pass, pixel_depth, display, 1);
+         mask = MASK(pass, pixel_depth, display, 1);  // 16 pngrutil.c:3407
 
          for (;;)
          {
@@ -3414,16 +3434,16 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
              * 32 bits because the high bits always match those in m<<24; it is,
              * however, essential to use OR here, not +, because of this.
              */
-            m = mask;
-            mask = (m >> 8) | (m << 24); /* rotate right to good compilers */
-            m &= 0xff;
+            m = mask;  // 17 pngrutil.c:3417
+            mask = (m >> 8) | (m << 24); /* rotate right to good compilers */  // 16 pngrutil.c:3418
+            m &= 0xff;  // 18 pngrutil.c:3419
 
             if (m != 0) /* something to copy */
             {
                if (m != 0xff)
-                  *dp = (png_byte)((*dp & ~m) | (*sp & m));
+                  *dp = (png_byte)((*dp & ~m) | (*sp & m));  // 19 pngrutil.c:3424
                else
-                  *dp = *sp;
+                  *dp = *sp;  // 19 pngrutil.c:3426
             }
 
             /* NOTE: this may overwrite the last byte with garbage if the image
@@ -3495,7 +3515,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
             case 1:
                for (;;)
                {
-                  *dp = *sp;
+                  *dp = *sp;  // 19 pngrutil.c:3498
 
                   if (row_width <= bytes_to_jump)
                      return;
@@ -3511,7 +3531,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                 */
                do
                {
-                  dp[0] = sp[0]; dp[1] = sp[1];
+                  dp[0] = sp[0]; dp[1] = sp[1];  // 19 pngrutil.c:3514
 
                   if (row_width <= bytes_to_jump)
                      return;
@@ -3523,7 +3543,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                while (row_width > 1);
 
                /* And there can only be one byte left at this point: */
-               *dp = *sp;
+               *dp = *sp;  // 19 pngrutil.c:3526
                return;
 
             case 3:
@@ -3532,7 +3552,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                 */
                for (;;)
                {
-                  dp[0] = sp[0]; dp[1] = sp[1]; dp[2] = sp[2];
+                  dp[0] = sp[0]; dp[1] = sp[1]; dp[2] = sp[2];  // 19 pngrutil.c:3535
 
                   if (row_width <= bytes_to_jump)
                      return;
@@ -3574,7 +3594,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                         size_t c = bytes_to_copy;
                         do
                         {
-                           *dp32++ = *sp32++;
+                           *dp32++ = *sp32++;  // 19 pngrutil.c:3577
                            c -= (sizeof (png_uint_32));
                         }
                         while (c > 0);
@@ -3595,7 +3615,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      dp = (png_bytep)dp32;
                      sp = (png_const_bytep)sp32;
                      do
-                        *dp++ = *sp++;
+                        *dp++ = *sp++;  // 19 pngrutil.c:3598
                      while (--row_width > 0);
                      return;
                   }
@@ -3616,7 +3636,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                         size_t c = bytes_to_copy;
                         do
                         {
-                           *dp16++ = *sp16++;
+                           *dp16++ = *sp16++;  // 19 pngrutil.c:3619
                            c -= (sizeof (png_uint_16));
                         }
                         while (c > 0);
@@ -3634,7 +3654,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      dp = (png_bytep)dp16;
                      sp = (png_const_bytep)sp16;
                      do
-                        *dp++ = *sp++;
+                        *dp++ = *sp++;  // 19 pngrutil.c:3637
                      while (--row_width > 0);
                      return;
                   }
@@ -3644,7 +3664,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                /* The true default - use a memcpy: */
                for (;;)
                {
-                  memcpy(dp, sp, bytes_to_copy);
+                  memcpy(dp, sp, bytes_to_copy);  // 19 pngrutil.c:3647
 
                   if (row_width <= bytes_to_jump)
                      return;
@@ -3669,11 +3689,11 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     * from the temporary row buffer (notice that this overwrites the end of the
     * destination row if it is a partial byte.)
     */
-   memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));
+   memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));  // 20 pngrutil.c:3672  // 19 pngrutil.c:3672
 
    /* Restore the overwritten bits from the last byte if necessary. */
    if (end_ptr != NULL)
-      *end_ptr = (png_byte)((end_byte & end_mask) | (*end_ptr & ~end_mask));
+      *end_ptr = (png_byte)((end_byte & end_mask) | (*end_ptr & ~end_mask));  // 19 pngrutil.c:3676
 }
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
@@ -3683,14 +3703,14 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 {
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    /* Offset to next interlace block */
-   static const unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};  // 15 pngrutil.c:3686
 
    png_debug(1, "in png_do_read_interlace");
    if (row != NULL && row_info != NULL)
    {
       png_uint_32 final_width;
 
-      final_width = row_info->width * png_pass_inc[pass];
+      final_width = row_info->width * png_pass_inc[pass];  // 16 pngrutil.c:3693
 
       switch (row_info->pixel_depth)
       {
@@ -3709,50 +3729,50 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #ifdef PNG_READ_PACKSWAP_SUPPORTED
             if ((transformations & PNG_PACKSWAP) != 0)
             {
-                sshift = ((row_info->width + 7) & 0x07);
-                dshift = ((final_width + 7) & 0x07);
-                s_start = 7;
+                sshift = ((row_info->width + 7) & 0x07);  // 16 pngrutil.c:3712
+                dshift = ((final_width + 7) & 0x07);  // 17 pngrutil.c:3713
+                s_start = 7;  // 16 pngrutil.c:3714
                 s_end = 0;
-                s_inc = -1;
+                s_inc = -1;  // 16 pngrutil.c:3716
             }
 
             else
 #endif
             {
-                sshift = 7 - ((row_info->width + 7) & 0x07);
-                dshift = 7 - ((final_width + 7) & 0x07);
-                s_start = 0;
+                sshift = 7 - ((row_info->width + 7) & 0x07);  // 16 pngrutil.c:3722
+                dshift = 7 - ((final_width + 7) & 0x07);  // 17 pngrutil.c:3723
+                s_start = 0;  // 16 pngrutil.c:3724
                 s_end = 7;
-                s_inc = 1;
+                s_inc = 1;  // 16 pngrutil.c:3726
             }
 
             for (i = 0; i < row_info->width; i++)
             {
-               v = (png_byte)((*sp >> sshift) & 0x01);
+               v = (png_byte)((*sp >> sshift) & 0x01);  // 17 pngrutil.c:3731
                for (j = 0; j < jstop; j++)
                {
-                  unsigned int tmp = *dp & (0x7f7f >> (7 - dshift));
-                  tmp |= (unsigned int)(v << dshift);
-                  *dp = (png_byte)(tmp & 0xff);
+                  unsigned int tmp = *dp & (0x7f7f >> (7 - dshift));  // 17 pngrutil.c:3734
+                  tmp |= (unsigned int)(v << dshift);  // 18 pngrutil.c:3735
+                  *dp = (png_byte)(tmp & 0xff);  // 19 pngrutil.c:3736
 
                   if (dshift == s_end)
                   {
-                     dshift = s_start;
+                     dshift = s_start;  // 17 pngrutil.c:3740
                      dp--;
                   }
 
                   else
-                     dshift = (unsigned int)((int)dshift + s_inc);
+                     dshift = (unsigned int)((int)dshift + s_inc);  // 17 pngrutil.c:3745
                }
 
                if (sshift == s_end)
                {
-                  sshift = s_start;
+                  sshift = s_start;  // 16 pngrutil.c:3750
                   sp--;
                }
 
                else
-                  sshift = (unsigned int)((int)sshift + s_inc);
+                  sshift = (unsigned int)((int)sshift + s_inc);  // 16 pngrutil.c:3755
             }
             break;
          }
@@ -3770,21 +3790,21 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #ifdef PNG_READ_PACKSWAP_SUPPORTED
             if ((transformations & PNG_PACKSWAP) != 0)
             {
-               sshift = (((row_info->width + 3) & 0x03) << 1);
-               dshift = (((final_width + 3) & 0x03) << 1);
-               s_start = 6;
+               sshift = (((row_info->width + 3) & 0x03) << 1);  // 16 pngrutil.c:3773
+               dshift = (((final_width + 3) & 0x03) << 1);  // 17 pngrutil.c:3774
+               s_start = 6;  // 16 pngrutil.c:3775
                s_end = 0;
-               s_inc = -2;
+               s_inc = -2;  // 16 pngrutil.c:3777
             }
 
             else
 #endif
             {
-               sshift = ((3 - ((row_info->width + 3) & 0x03)) << 1);
-               dshift = ((3 - ((final_width + 3) & 0x03)) << 1);
-               s_start = 0;
+               sshift = ((3 - ((row_info->width + 3) & 0x03)) << 1);  // 16 pngrutil.c:3783
+               dshift = ((3 - ((final_width + 3) & 0x03)) << 1);  // 17 pngrutil.c:3784
+               s_start = 0;  // 16 pngrutil.c:3785
                s_end = 6;
-               s_inc = 2;
+               s_inc = 2;  // 16 pngrutil.c:3787
             }
 
             for (i = 0; i < row_info->width; i++)
@@ -3792,31 +3812,31 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                png_byte v;
                int j;
 
-               v = (png_byte)((*sp >> sshift) & 0x03);
+               v = (png_byte)((*sp >> sshift) & 0x03);  // 17 pngrutil.c:3795
                for (j = 0; j < jstop; j++)
                {
-                  unsigned int tmp = *dp & (0x3f3f >> (6 - dshift));
-                  tmp |= (unsigned int)(v << dshift);
-                  *dp = (png_byte)(tmp & 0xff);
+                  unsigned int tmp = *dp & (0x3f3f >> (6 - dshift));  // 17 pngrutil.c:3798
+                  tmp |= (unsigned int)(v << dshift);  // 18 pngrutil.c:3799
+                  *dp = (png_byte)(tmp & 0xff);  // 19 pngrutil.c:3800
 
                   if (dshift == s_end)
                   {
-                     dshift = s_start;
+                     dshift = s_start;  // 17 pngrutil.c:3804
                      dp--;
                   }
 
                   else
-                     dshift = (unsigned int)((int)dshift + s_inc);
+                     dshift = (unsigned int)((int)dshift + s_inc);  // 17 pngrutil.c:3809
                }
 
                if (sshift == s_end)
                {
-                  sshift = s_start;
+                  sshift = s_start;  // 16 pngrutil.c:3814
                   sp--;
                }
 
                else
-                  sshift = (unsigned int)((int)sshift + s_inc);
+                  sshift = (unsigned int)((int)sshift + s_inc);  // 16 pngrutil.c:3819
             }
             break;
          }
@@ -3834,52 +3854,52 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 #ifdef PNG_READ_PACKSWAP_SUPPORTED
             if ((transformations & PNG_PACKSWAP) != 0)
             {
-               sshift = (((row_info->width + 1) & 0x01) << 2);
-               dshift = (((final_width + 1) & 0x01) << 2);
-               s_start = 4;
+               sshift = (((row_info->width + 1) & 0x01) << 2);  // 16 pngrutil.c:3837
+               dshift = (((final_width + 1) & 0x01) << 2);  // 17 pngrutil.c:3838
+               s_start = 4;  // 16 pngrutil.c:3839
                s_end = 0;
-               s_inc = -4;
+               s_inc = -4;  // 16 pngrutil.c:3841
             }
 
             else
 #endif
             {
-               sshift = ((1 - ((row_info->width + 1) & 0x01)) << 2);
-               dshift = ((1 - ((final_width + 1) & 0x01)) << 2);
-               s_start = 0;
+               sshift = ((1 - ((row_info->width + 1) & 0x01)) << 2);  // 16 pngrutil.c:3847
+               dshift = ((1 - ((final_width + 1) & 0x01)) << 2);  // 17 pngrutil.c:3848
+               s_start = 0;  // 16 pngrutil.c:3849
                s_end = 4;
-               s_inc = 4;
+               s_inc = 4;  // 16 pngrutil.c:3851
             }
 
             for (i = 0; i < row_info->width; i++)
             {
-               png_byte v = (png_byte)((*sp >> sshift) & 0x0f);
+               png_byte v = (png_byte)((*sp >> sshift) & 0x0f);  // 17 pngrutil.c:3856
                int j;
 
                for (j = 0; j < jstop; j++)
                {
-                  unsigned int tmp = *dp & (0xf0f >> (4 - dshift));
-                  tmp |= (unsigned int)(v << dshift);
-                  *dp = (png_byte)(tmp & 0xff);
+                  unsigned int tmp = *dp & (0xf0f >> (4 - dshift));  // 17 pngrutil.c:3861
+                  tmp |= (unsigned int)(v << dshift);  // 18 pngrutil.c:3862
+                  *dp = (png_byte)(tmp & 0xff);  // 19 pngrutil.c:3863
 
                   if (dshift == s_end)
                   {
-                     dshift = s_start;
+                     dshift = s_start;  // 17 pngrutil.c:3867
                      dp--;
                   }
 
                   else
-                     dshift = (unsigned int)((int)dshift + s_inc);
+                     dshift = (unsigned int)((int)dshift + s_inc);  // 17 pngrutil.c:3872
                }
 
                if (sshift == s_end)
                {
-                  sshift = s_start;
+                  sshift = s_start;  // 16 pngrutil.c:3877
                   sp--;
                }
 
                else
-                  sshift = (unsigned int)((int)sshift + s_inc);
+                  sshift = (unsigned int)((int)sshift + s_inc);  // 16 pngrutil.c:3882
             }
             break;
          }
@@ -3901,11 +3921,11 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                png_byte v[8]; /* SAFE; pixel_depth does not exceed 64 */
                int j;
 
-               memcpy(v, sp, pixel_bytes);
+               memcpy(v, sp, pixel_bytes);  // 18 pngrutil.c:3904
 
                for (j = 0; j < jstop; j++)
                {
-                  memcpy(dp, v, pixel_bytes);
+                  memcpy(dp, v, pixel_bytes);  // 19 pngrutil.c:3908
                   dp -= pixel_bytes;
                }
 
@@ -3937,7 +3957,7 @@ png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
 
    for (i = bpp; i < istop; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);  // 18 pngrutil.c:3940
       rp++;
    }
 }
@@ -3953,7 +3973,7 @@ png_read_filter_row_up(png_row_infop row_info, png_bytep row,
 
    for (i = 0; i < istop; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);  // 18 pngrutil.c:3956
       rp++;
    }
 }
@@ -3970,7 +3990,7 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
 
    for (i = 0; i < bpp; i++)
    {
-      *rp = (png_byte)(((int)(*rp) +
+      *rp = (png_byte)(((int)(*rp) +  // 18 pngrutil.c:3973
          ((int)(*pp++) / 2 )) & 0xff);
 
       rp++;
@@ -3978,7 +3998,7 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
 
    for (i = 0; i < istop; i++)
    {
-      *rp = (png_byte)(((int)(*rp) +
+      *rp = (png_byte)(((int)(*rp) +  // 18 pngrutil.c:3981
          (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
 
       rp++;
@@ -3993,17 +4013,17 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
    int a, c;
 
    /* First pixel/byte */
-   c = *prev_row++;
-   a = *row + c;
-   *row++ = (png_byte)a;
+   c = *prev_row++;  // 16 pngrutil.c:3996
+   a = *row + c;  // 17 pngrutil.c:3997
+   *row++ = (png_byte)a;  // 18 pngrutil.c:3998
 
    /* Remainder */
    while (row < rp_end)
    {
       int b, pa, pb, pc, p;
 
-      a &= 0xff; /* From previous iteration or start */
-      b = *prev_row++;
+      a &= 0xff; /* From previous iteration or start */  // 16 pngrutil.c:4005
+      b = *prev_row++;  // 15 pngrutil.c:4006
 
       p = b - c;
       pc = a - c;
@@ -4023,16 +4043,16 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
        */
       if (pb < pa)
       {
-         pa = pb; a = b;
+         pa = pb; a = b;  // 16 pngrutil.c:4026
       }
-      if (pc < pa) a = c;
+      if (pc < pa) a = c;  // 16 pngrutil.c:4028
 
       /* Calculate the current pixel in a, and move the previous row pixel to c
        * for the next time round the loop
        */
-      c = b;
-      a += *row;
-      *row++ = (png_byte)a;
+      c = b;  // 15 pngrutil.c:4033
+      a += *row;  // 17 pngrutil.c:4034
+      *row++ = (png_byte)a;  // 18 pngrutil.c:4035
    }
 }
 
@@ -4048,8 +4068,8 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
     */
    while (row < rp_end)
    {
-      int a = *row + *prev_row++;
-      *row++ = (png_byte)a;
+      int a = *row + *prev_row++;  // 17 pngrutil.c:4051
+      *row++ = (png_byte)a;  // 18 pngrutil.c:4052
    }
 
    /* Remainder */
@@ -4059,9 +4079,9 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
    {
       int a, b, c, pa, pb, pc, p;
 
-      c = *(prev_row - bpp);
-      a = *(row - bpp);
-      b = *prev_row++;
+      c = *(prev_row - bpp);  // 15 pngrutil.c:4062
+      a = *(row - bpp);  // 16 pngrutil.c:4063
+      b = *prev_row++;  // 15 pngrutil.c:4064
 
       p = b - c;
       pc = a - c;
@@ -4078,12 +4098,12 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
       if (pb < pa)
       {
-         pa = pb; a = b;
+         pa = pb; a = b;  // 16 pngrutil.c:4081
       }
-      if (pc < pa) a = c;
+      if (pc < pa) a = c;  // 16 pngrutil.c:4083
 
-      a += *row;
-      *row++ = (png_byte)a;
+      a += *row;  // 17 pngrutil.c:4085
+      *row++ = (png_byte)a;  // 18 pngrutil.c:4086
    }
 }
 
@@ -4148,26 +4168,32 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
 {
    /* Loop reading IDATs and decompressing the result into output[avail_out] */
    png_ptr->zstream.next_out = output;
-   png_ptr->zstream.avail_out = 0; /* safety: set below */
+   png_ptr->zstream.avail_out = 0; /* safety: set below */  // 3 pngrutil.c:4151  // 6 pngrutil.c:4151
 
    if (output == NULL)
-      avail_out = 0;
+      avail_out = 0;  // 2 pngrutil.c:4154  // 5 pngrutil.c:4154
 
    do
    {
       int ret;
       png_byte tmpbuf[PNG_INFLATE_BUF_SIZE];
 
-      if (png_ptr->zstream.avail_in == 0)
+expr_moran[0] = (png_ptr->zstream.avail_in == 0), low_moran[0] = -1, high_moran[0] = -1;
+      expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+      mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
+      if (expr_moran[0])
       {
          uInt avail_in;
          png_bytep buffer;
 
+expr_moran[0] = png_ptr->idat_size == 0, low_moran[0] = -1, high_moran[0] = -1;
+         expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+         mdafl_gc_log(502, 1, 1, low_moran, high_moran, expr_moran, 0);
          while (png_ptr->idat_size == 0)
          {
             png_crc_finish(png_ptr, 0);
 
-            png_ptr->idat_size = png_read_chunk_header(png_ptr);
+            png_ptr->idat_size = png_read_chunk_header(png_ptr);  // 10 pngrutil.c:4170  // 8 pngrutil.c:4170  // 13 pngrutil.c:4170
             /* This is an error even in the 'check' case because the code just
              * consumed a non-IDAT header.
              */
@@ -4175,20 +4201,20 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
                png_error(png_ptr, "Not enough image data");
          }
 
-         avail_in = png_ptr->IDAT_read_size;
+         avail_in = png_ptr->IDAT_read_size;  // 11 pngrutil.c:4178  // 14 pngrutil.c:4178
 
          if (avail_in > png_ptr->idat_size)
-            avail_in = (uInt)png_ptr->idat_size;
+            avail_in = (uInt)png_ptr->idat_size;  // 11 pngrutil.c:4181  // 14 pngrutil.c:4181
 
          /* A PNG with a gradually increasing IDAT size will defeat this attempt
           * to minimize memory usage by causing lots of re-allocs, but
           * realistically doing IDAT_read_size re-allocs is not likely to be a
           * big problem.
           */
-         buffer = png_read_buffer(png_ptr, avail_in, 0/*error*/);
+         buffer = png_read_buffer(png_ptr, avail_in, 0/*error*/);  // 12 pngrutil.c:4188  // 15 pngrutil.c:4188
 
          png_crc_read(png_ptr, buffer, avail_in);
-         png_ptr->idat_size -= avail_in;
+         png_ptr->idat_size -= avail_in;  // 10 pngrutil.c:4191  // 13 pngrutil.c:4191
 
          png_ptr->zstream.next_in = buffer;
          png_ptr->zstream.avail_in = avail_in;
@@ -4197,19 +4223,19 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
       /* And set up the output side. */
       if (output != NULL) /* standard read */
       {
-         uInt out = ZLIB_IO_MAX;
+         uInt out = ZLIB_IO_MAX;  // 3 pngrutil.c:4200  // 6 pngrutil.c:4200
 
          if (out > avail_out)
-            out = (uInt)avail_out;
+            out = (uInt)avail_out;  // 3 pngrutil.c:4203  // 6 pngrutil.c:4203
 
-         avail_out -= out;
-         png_ptr->zstream.avail_out = out;
+         avail_out -= out;  // 1 pngrutil.c:4205  // 4 pngrutil.c:4205
+         png_ptr->zstream.avail_out = out;  // 4 pngrutil.c:4206  // 7 pngrutil.c:4206
       }
 
       else /* after last row, checking for end */
       {
          png_ptr->zstream.next_out = tmpbuf;
-         png_ptr->zstream.avail_out = (sizeof tmpbuf);
+         png_ptr->zstream.avail_out = (sizeof tmpbuf);  // 4 pngrutil.c:4212  // 7 pngrutil.c:4212
       }
 
       /* Use NO_FLUSH; this gives zlib the maximum opportunity to optimize the
@@ -4219,16 +4245,16 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
        *
        * TODO: deal more elegantly with truncated IDAT lists.
        */
-      ret = PNG_INFLATE(png_ptr, Z_NO_FLUSH);
+      ret = PNG_INFLATE(png_ptr, Z_NO_FLUSH);  // 9 pngrutil.c:4222
 
       /* Take the unconsumed output back. */
       if (output != NULL)
-         avail_out += png_ptr->zstream.avail_out;
+         avail_out += png_ptr->zstream.avail_out;  // 2 pngrutil.c:4226  // 5 pngrutil.c:4226
 
       else /* avail_out counts the extra bytes */
-         avail_out += (sizeof tmpbuf) - png_ptr->zstream.avail_out;
+         avail_out += (sizeof tmpbuf) - png_ptr->zstream.avail_out;  // 2 pngrutil.c:4229  // 5 pngrutil.c:4229
 
-      png_ptr->zstream.avail_out = 0;
+      png_ptr->zstream.avail_out = 0;  // 5 pngrutil.c:4231  // 8 pngrutil.c:4231
 
       if (ret == Z_STREAM_END)
       {
@@ -4279,13 +4305,16 @@ png_read_finish_IDAT(png_structrp png_ptr)
     * read it otherwise stray unread IDAT data or, more likely, an IDAT chunk
     * may still remain to be consumed.
     */
-   if ((png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0)
+expr_moran[0] = ((png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0), low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(401, 2, 1, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       /* The NULL causes png_read_IDAT_data to swallow any remaining bytes in
        * the compressed stream, but the stream may be damaged too, so even after
        * this call we may need to terminate the zstream ownership.
        */
-      png_read_IDAT_data(png_ptr, NULL, 0);
+      png_read_IDAT_data(png_ptr, NULL, 0);  // 2 pngrutil.c:4288  // 8 pngrutil.c:4288  // 7 pngrutil.c:4288  // 5 pngrutil.c:4288
       png_ptr->zstream.next_out = NULL; /* safety */
 
       /* Now clear everything out for safety; the following may not have been
@@ -4325,10 +4354,10 @@ png_read_finish_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};  // 14 pngrutil.c:4328  // 1 pngrutil.c:4328  // 16 pngrutil.c:4328
 
    /* Offset to next interlace block */
-   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};  // 14 pngrutil.c:4331  // 1 pngrutil.c:4331  // 16 pngrutil.c:4331
 
    /* Start of interlace block in the y direction */
    static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
@@ -4338,10 +4367,16 @@ png_read_finish_row(png_structrp png_ptr)
 
    png_debug(1, "in png_read_finish_row");
    png_ptr->row_number++;
-   if (png_ptr->row_number < png_ptr->num_rows)
+expr_moran[0] = png_ptr->row_number, low_moran[0] = DBL_MIN, high_moran[0] = png_ptr->num_rows;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+mdafl_gc_log(301, 2, 0, low_moran, high_moran, expr_moran, 1);
+if (expr_moran[0] < high_moran[0])
       return;
 
-   if (png_ptr->interlaced != 0)
+expr_moran[0] = (png_ptr->interlaced != 0), low_moran[0] = -1, high_moran[0] = -1;
+   expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+   mdafl_gc_log(302, 2, 0, low_moran, high_moran, expr_moran, 0);
+   if (expr_moran[0])
    {
       png_ptr->row_number = 0;
 
@@ -4357,7 +4392,7 @@ png_read_finish_row(png_structrp png_ptr)
          if (png_ptr->pass >= 7)
             break;
 
-         png_ptr->iwidth = (png_ptr->width +
+         png_ptr->iwidth = (png_ptr->width +  // 15 pngrutil.c:4360  // 2 pngrutil.c:4360  // 17 pngrutil.c:4360
             png_pass_inc[png_ptr->pass] - 1 -
             png_pass_start[png_ptr->pass]) /
             png_pass_inc[png_ptr->pass];
@@ -4375,12 +4410,15 @@ png_read_finish_row(png_structrp png_ptr)
 
       } while (png_ptr->num_rows == 0 || png_ptr->iwidth == 0);
 
-      if (png_ptr->pass < 7)
+expr_moran[0] = png_ptr->pass, low_moran[0] = DBL_MIN, high_moran[0] = 7;
+      expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
+      mdafl_gc_log(303, 2, 0, low_moran, high_moran, expr_moran, 1);
+      if (expr_moran[0] < high_moran[0])
          return;
    }
 
    /* Here after at the end of the last row of the last pass. */
-   png_read_finish_IDAT(png_ptr);
+   png_read_finish_IDAT(png_ptr);  // 7 pngrutil.c:4383  // 6 pngrutil.c:4383
 }
 #endif /* SEQUENTIAL_READ */
 
@@ -4390,10 +4428,10 @@ png_read_start_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};  // 14 pngrutil.c:4393  // 1 pngrutil.c:4393  // 16 pngrutil.c:4393
 
    /* Offset to next interlace block */
-   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};  // 14 pngrutil.c:4396  // 1 pngrutil.c:4396  // 16 pngrutil.c:4396
 
    /* Start of interlace block in the y direction */
    static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
@@ -4418,7 +4456,7 @@ png_read_start_row(png_structrp png_ptr)
       else
          png_ptr->num_rows = png_ptr->height;
 
-      png_ptr->iwidth = (png_ptr->width +
+      png_ptr->iwidth = (png_ptr->width +  // 15 pngrutil.c:4421  // 2 pngrutil.c:4421  // 17 pngrutil.c:4421
           png_pass_inc[png_ptr->pass] - 1 -
           png_pass_start[png_ptr->pass]) /
           png_pass_inc[png_ptr->pass];
@@ -4427,10 +4465,10 @@ png_read_start_row(png_structrp png_ptr)
    else
    {
       png_ptr->num_rows = png_ptr->height;
-      png_ptr->iwidth = png_ptr->width;
+      png_ptr->iwidth = png_ptr->width;  // 15 pngrutil.c:4430  // 2 pngrutil.c:4430  // 17 pngrutil.c:4430
    }
 
-   max_pixel_depth = (unsigned int)png_ptr->pixel_depth;
+   max_pixel_depth = (unsigned int)png_ptr->pixel_depth;  // 14 pngrutil.c:4433  // 17 pngrutil.c:4433  // 15 pngrutil.c:4433
 
    /* WARNING: * png_read_transform_info (pngrtran.c) performs a simpler set of
     * calculations to calculate the final pixel depth, then
@@ -4444,7 +4482,7 @@ png_read_start_row(png_structrp png_ptr)
     */
 #ifdef PNG_READ_PACK_SUPPORTED
    if ((png_ptr->transformations & PNG_PACK) != 0 && png_ptr->bit_depth < 8)
-      max_pixel_depth = 8;
+      max_pixel_depth = 8;  // 14 pngrutil.c:4447  // 17 pngrutil.c:4447  // 15 pngrutil.c:4447
 #endif
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -4453,27 +4491,27 @@ png_read_start_row(png_structrp png_ptr)
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          if (png_ptr->num_trans != 0)
-            max_pixel_depth = 32;
+            max_pixel_depth = 32;  // 14 pngrutil.c:4456  // 17 pngrutil.c:4456  // 15 pngrutil.c:4456
 
          else
-            max_pixel_depth = 24;
+            max_pixel_depth = 24;  // 14 pngrutil.c:4459  // 17 pngrutil.c:4459  // 15 pngrutil.c:4459
       }
 
       else if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
       {
          if (max_pixel_depth < 8)
-            max_pixel_depth = 8;
+            max_pixel_depth = 8;  // 14 pngrutil.c:4465  // 17 pngrutil.c:4465  // 15 pngrutil.c:4465
 
          if (png_ptr->num_trans != 0)
-            max_pixel_depth *= 2;
+            max_pixel_depth *= 2;  // 14 pngrutil.c:4468  // 17 pngrutil.c:4468  // 15 pngrutil.c:4468
       }
 
       else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
       {
          if (png_ptr->num_trans != 0)
          {
-            max_pixel_depth *= 4;
-            max_pixel_depth /= 3;
+            max_pixel_depth *= 4;  // 13 pngrutil.c:4475  // 16 pngrutil.c:4475  // 14 pngrutil.c:4475
+            max_pixel_depth /= 3;  // 14 pngrutil.c:4476  // 17 pngrutil.c:4476  // 15 pngrutil.c:4476
          }
       }
    }
@@ -4489,7 +4527,7 @@ png_read_start_row(png_structrp png_ptr)
       if ((png_ptr->transformations & PNG_EXPAND) != 0)
       {
          if (png_ptr->bit_depth < 16)
-            max_pixel_depth *= 2;
+            max_pixel_depth *= 2;  // 14 pngrutil.c:4492  // 17 pngrutil.c:4492  // 15 pngrutil.c:4492
       }
       else
 #  endif
@@ -4503,20 +4541,20 @@ png_read_start_row(png_structrp png_ptr)
       if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
       {
          if (max_pixel_depth <= 8)
-            max_pixel_depth = 16;
+            max_pixel_depth = 16;  // 14 pngrutil.c:4506  // 17 pngrutil.c:4506  // 15 pngrutil.c:4506
 
          else
-            max_pixel_depth = 32;
+            max_pixel_depth = 32;  // 14 pngrutil.c:4509  // 17 pngrutil.c:4509  // 15 pngrutil.c:4509
       }
 
       else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB ||
          png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          if (max_pixel_depth <= 32)
-            max_pixel_depth = 32;
+            max_pixel_depth = 32;  // 14 pngrutil.c:4516  // 17 pngrutil.c:4516  // 15 pngrutil.c:4516
 
          else
-            max_pixel_depth = 64;
+            max_pixel_depth = 64;  // 14 pngrutil.c:4519  // 17 pngrutil.c:4519  // 15 pngrutil.c:4519
       }
    }
 #endif
@@ -4535,10 +4573,10 @@ png_read_start_row(png_structrp png_ptr)
           png_ptr->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       {
          if (max_pixel_depth <= 16)
-            max_pixel_depth = 32;
+            max_pixel_depth = 32;  // 14 pngrutil.c:4538  // 17 pngrutil.c:4538  // 15 pngrutil.c:4538
 
          else
-            max_pixel_depth = 64;
+            max_pixel_depth = 64;  // 14 pngrutil.c:4541  // 17 pngrutil.c:4541  // 15 pngrutil.c:4541
       }
 
       else
@@ -4546,17 +4584,17 @@ png_read_start_row(png_structrp png_ptr)
          if (max_pixel_depth <= 8)
          {
             if (png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-               max_pixel_depth = 32;
+               max_pixel_depth = 32;  // 14 pngrutil.c:4549  // 17 pngrutil.c:4549  // 15 pngrutil.c:4549
 
             else
-               max_pixel_depth = 24;
+               max_pixel_depth = 24;  // 14 pngrutil.c:4552  // 17 pngrutil.c:4552  // 15 pngrutil.c:4552
          }
 
          else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-            max_pixel_depth = 64;
+            max_pixel_depth = 64;  // 14 pngrutil.c:4556  // 17 pngrutil.c:4556  // 15 pngrutil.c:4556
 
          else
-            max_pixel_depth = 48;
+            max_pixel_depth = 48;  // 14 pngrutil.c:4559  // 17 pngrutil.c:4559  // 15 pngrutil.c:4559
       }
    }
 #endif
@@ -4569,7 +4607,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
          png_ptr->user_transform_channels;
 
       if (user_pixel_depth > max_pixel_depth)
-         max_pixel_depth = user_pixel_depth;
+         max_pixel_depth = user_pixel_depth;  // 14 pngrutil.c:4572  // 17 pngrutil.c:4572  // 15 pngrutil.c:4572
    }
 #endif
 
@@ -4577,16 +4615,16 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
     * code.
     */
    png_ptr->maximum_pixel_depth = (png_byte)max_pixel_depth;
-   png_ptr->transformed_pixel_depth = 0; /* calculated on demand */
+   png_ptr->transformed_pixel_depth = 0; /* calculated on demand */  // 18 pngrutil.c:4580  // 16 pngrutil.c:4580
 
    /* Align the width on the next larger 8 pixels.  Mainly used
     * for interlacing
     */
-   row_bytes = ((png_ptr->width + 7) & ~((png_uint_32)7));
+   row_bytes = ((png_ptr->width + 7) & ~((png_uint_32)7));  // 14 pngrutil.c:4585  // 17 pngrutil.c:4585  // 15 pngrutil.c:4585
    /* Calculate the maximum bytes needed, adding a byte and a pixel
     * for safety's sake
     */
-   row_bytes = PNG_ROWBYTES(max_pixel_depth, row_bytes) +
+   row_bytes = PNG_ROWBYTES(max_pixel_depth, row_bytes) +  // 15 pngrutil.c:4589  // 18 pngrutil.c:4589  // 16 pngrutil.c:4589
        1 + ((max_pixel_depth + 7) >> 3U);
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -4600,13 +4638,13 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_free(png_ptr, png_ptr->big_prev_row);
 
       if (png_ptr->interlaced != 0)
-         png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,
+         png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,  // 16 pngrutil.c:4603  // 19 pngrutil.c:4603  // 17 pngrutil.c:4603
              row_bytes + 48);
 
       else
-         png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
+         png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 48);  // 16 pngrutil.c:4607  // 17 pngrutil.c:4607
 
-      png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
+      png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);  // 14 pngrutil.c:4609  // 17 pngrutil.c:4609
 
 #ifdef PNG_ALIGNED_MEMORY_SUPPORTED
       /* Use 16-byte aligned memory for row_buf with at least 16 bytes
@@ -4617,9 +4655,9 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
        * opposite effect of that intended.
        */
       {
-         png_bytep temp = png_ptr->big_row_buf + 32;
+         png_bytep temp = png_ptr->big_row_buf + 32;  // 17 pngrutil.c:4620  // 18 pngrutil.c:4620
          int extra = (int)((temp - (png_bytep)0) & 0x0f);
-         png_ptr->row_buf = temp - extra - 1/*filter byte*/;
+         png_ptr->row_buf = temp - extra - 1/*filter byte*/;  // 18 pngrutil.c:4622  // 19 pngrutil.c:4622
 
          temp = png_ptr->big_prev_row + 32;
          extra = (int)((temp - (png_bytep)0) & 0x0f);
@@ -4661,7 +4699,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_bytep buffer = png_ptr->read_buffer;
 
       png_ptr->read_buffer_size = 0;
-      png_ptr->read_buffer = NULL;
+      png_ptr->read_buffer = NULL;  // 9 pngrutil.c:4664  // 12 pngrutil.c:4664
       png_free(png_ptr, buffer);
    }
 

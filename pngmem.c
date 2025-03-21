@@ -51,12 +51,12 @@ png_calloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
-   ret = png_malloc(png_ptr, size);
+   ret = png_malloc(png_ptr, size);  // 14 pngmem.c:54  // 20 pngmem.c:54  // 17 pngmem.c:54
 
    if (ret != NULL)
       memset(ret, 0, size);
 
-   return ret;
+   return ret;  // 15 pngmem.c:59  // 21 pngmem.c:59  // 18 pngmem.c:59
 }
 
 /* png_malloc_base, an internal function added at libpng 1.6.0, does the work of
@@ -88,15 +88,15 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
    {
 #ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
-         return png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);
+         return png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);  // 14 pngmem.c:91  // 17 pngmem.c:91
 
       else
 #endif
-         return malloc((size_t)size); /* checked for truncation above */
+         return malloc((size_t)size); /* checked for truncation above */  // 14 pngmem.c:95  // 17 pngmem.c:95
    }
 
    else
-      return NULL;
+      return NULL;  // 14 pngmem.c:99  // 17 pngmem.c:99
 }
 
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
@@ -174,14 +174,14 @@ png_malloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
    png_voidp ret;
 
    if (png_ptr == NULL)
-      return NULL;
+      return NULL;  // 16 pngmem.c:177  // 19 pngmem.c:177
 
-   ret = png_malloc_base(png_ptr, size);
+   ret = png_malloc_base(png_ptr, size);  // 15 pngmem.c:179  // 18 pngmem.c:179
 
    if (ret == NULL)
        png_error(png_ptr, "Out of memory"); /* 'm' means png_malloc */
 
-   return ret;
+   return ret;  // 16 pngmem.c:184  // 19 pngmem.c:184
 }
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -214,7 +214,7 @@ png_malloc_warn,(png_const_structrp png_ptr, png_alloc_size_t size),
 {
    if (png_ptr != NULL)
    {
-      png_voidp ret = png_malloc_base(png_ptr, size);
+      png_voidp ret = png_malloc_base(png_ptr, size);  // 13 pngmem.c:217  // 16 pngmem.c:217
 
       if (ret != NULL)
          return ret;

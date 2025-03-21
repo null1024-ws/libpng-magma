@@ -18,7 +18,7 @@ check_PROGRAMS += timepng
 endif
 
 # Utilities - installed
-bin_PROGRAMS= pngfix png-fix-itxt
+bin_PROGRAMS= pngfix png-fix-itxt libpng-read-fuzzer
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
@@ -55,6 +55,9 @@ png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 
 pngcp_SOURCES = contrib/tools/pngcp.c
 pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+libpng_read_fuzzer_SOURCES = contrib/oss-fuzz/libpng_read_fuzzer.c contrib/oss-fuzz/afl_driver.c
+libpng_read_fuzzer_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la $(LIBS) -lz
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:

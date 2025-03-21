@@ -316,7 +316,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
           */
          if (png_user_version_check(&create_struct, user_png_ver) != 0)
          {
-            png_structrp png_ptr = png_voidcast(png_structrp,
+            png_structrp png_ptr = png_voidcast(png_structrp,  // 1 png.c:319  // 14 png.c:319
                 png_malloc_warn(&create_struct, (sizeof *png_ptr)));
 
             if (png_ptr != NULL)
@@ -338,7 +338,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
                *png_ptr = create_struct;
 
                /* This is the successful return point */
-               return png_ptr;
+               return png_ptr;  // 2 png.c:341  // 15 png.c:341
             }
          }
       }
@@ -346,7 +346,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
    /* A longjmp because of a bug in the application storage allocator or a
     * simple failure to allocate the png_struct.
     */
-   return NULL;
+   return NULL;  // 2 png.c:349  // 15 png.c:349
 }
 
 /* Allocate the memory for an info_struct for the application. */
@@ -1884,7 +1884,7 @@ png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * libpng has traditionally used (and are the best values given the 15bit
     * algorithm used by the rgb to gray code.)
     */
-   static const png_XYZ sRGB_XYZ = /* D65 XYZ (*not* the D50 adapted values!) */
+   static const png_XYZ sRGB_XYZ = /* D65 XYZ (*not* the D50 adapted values!) */  // 15 png.c:1887
    {
       /* color      X      Y      Z */
       /* red   */ 41239, 21264,  1933,
@@ -2475,8 +2475,8 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
       /* png_set_background has not been called, get the coefficients from the Y
        * values of the colorspace colorants.
        */
-      png_fixed_point r = png_ptr->colorspace.end_points_XYZ.red_Y;
-      png_fixed_point g = png_ptr->colorspace.end_points_XYZ.green_Y;
+      png_fixed_point r = png_ptr->colorspace.end_points_XYZ.red_Y;  // 16 png.c:2478
+      png_fixed_point g = png_ptr->colorspace.end_points_XYZ.green_Y;  // 16 png.c:2479
       png_fixed_point b = png_ptr->colorspace.end_points_XYZ.blue_Y;
       png_fixed_point total = r+g+b;
 
@@ -2491,19 +2491,19 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
           * reducing the *largest* coefficient by 1; this matches the
           * approach used for the default coefficients in pngrtran.c
           */
-         int add = 0;
+         int add = 0;  // 15 png.c:2494
 
          if (r+g+b > 32768)
-            add = -1;
+            add = -1;  // 15 png.c:2497
          else if (r+g+b < 32768)
-            add = 1;
+            add = 1;  // 15 png.c:2499
 
          if (add != 0)
          {
             if (g >= r && g >= b)
-               g += add;
+               g += add;  // 16 png.c:2504
             else if (r >= g && r >= b)
-               r += add;
+               r += add;  // 16 png.c:2506
             else
                b += add;
          }
@@ -2515,8 +2515,8 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 
          else
          {
-            png_ptr->rgb_to_gray_red_coeff   = (png_uint_16)r;
-            png_ptr->rgb_to_gray_green_coeff = (png_uint_16)g;
+            png_ptr->rgb_to_gray_red_coeff   = (png_uint_16)r;  // 17 png.c:2518
+            png_ptr->rgb_to_gray_green_coeff = (png_uint_16)g;  // 17 png.c:2519
          }
       }
 
@@ -3354,7 +3354,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
    {
       if (a == 0 || times == 0)
       {
-         *res = 0;
+         *res = 0;  // 16 png.c:3357
          return 1;
       }
       else
@@ -3363,12 +3363,12 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          double r = a;
          r *= times;
          r /= divisor;
-         r = floor(r+.5);
+         r = floor(r+.5);  // 15 png.c:3366
 
          /* A png_fixed_point is a 32-bit integer. */
          if (r <= 2147483647. && r >= -2147483648.)
          {
-            *res = (png_fixed_point)r;
+            *res = (png_fixed_point)r;  // 16 png.c:3371
             return 1;
          }
 #else
@@ -3890,8 +3890,8 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * range for an (int); that would result in undefined behavior in the
           * caller if the *argument* ('value') were to be declared (int).
           */
-         double r = floor(255*pow((int)/*SAFE*/value/255.,gamma_val*.00001)+.5);
-         return (png_byte)r;
+         double r = floor(255*pow((int)/*SAFE*/value/255.,gamma_val*.00001)+.5);  // 17 png.c:3893
+         return (png_byte)r;  // 18 png.c:3894
 #     else
          png_int_32 lg2 = png_log8bit(value);
          png_fixed_point res;
@@ -3904,7 +3904,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
 #     endif
    }
 
-   return (png_byte)(value & 0xff);
+   return (png_byte)(value & 0xff);  // 18 png.c:3907
 }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -3919,9 +3919,9 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
        * overflow on an ANSI-C90 compliant system so the cast needs to ensure
        * that this is not possible.
        */
-      double r = floor(65535*pow((png_int_32)value/65535.,
+      double r = floor(65535*pow((png_int_32)value/65535.,  // 15 png.c:3922
           gamma_val*.00001)+.5);
-      return (png_uint_16)r;
+      return (png_uint_16)r;  // 16 png.c:3924
 # else
       png_int_32 lg2 = png_log16bit(value);
       png_fixed_point res;
@@ -3934,7 +3934,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 # endif
    }
 
-   return (png_uint_16)value;
+   return (png_uint_16)value;  // 16 png.c:3937
 }
 #endif /* 16BIT */
 
@@ -3948,11 +3948,11 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
     png_fixed_point gamma_val)
 {
    if (png_ptr->bit_depth == 8)
-      return png_gamma_8bit_correct(value, gamma_val);
+      return png_gamma_8bit_correct(value, gamma_val);  // 17 png.c:3951
 
 #ifdef PNG_16BIT_SUPPORTED
    else
-      return png_gamma_16bit_correct(value, gamma_val);
+      return png_gamma_16bit_correct(value, gamma_val);  // 17 png.c:3955
 #else
       /* should not reach this */
       return 0;
@@ -3973,23 +3973,23 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
     unsigned int shift, png_fixed_point gamma_val)
 {
    /* Various values derived from 'shift': */
-   unsigned int num = 1U << (8U - shift);
+   unsigned int num = 1U << (8U - shift);  // 12 png.c:3976  // 18 png.c:3976  // 15 png.c:3976
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    /* CSE the division and work round wacky GCC warnings (see the comments
     * in png_gamma_8bit_correct for where these come from.)
     */
    double fmax = 1.0 / (((png_int_32)1 << (16U - shift)) - 1);
 #endif
-   unsigned int max = (1U << (16U - shift)) - 1U;
-   unsigned int max_by_2 = 1U << (15U - shift);
+   unsigned int max = (1U << (16U - shift)) - 1U;  // 15 png.c:3983
+   unsigned int max_by_2 = 1U << (15U - shift);  // 15 png.c:3984
    unsigned int i;
 
-   png_uint_16pp table = *ptable =
+   png_uint_16pp table = *ptable =  // 13 png.c:3987  // 19 png.c:3987  // 16 png.c:3987
        (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
 
-   for (i = 0; i < num; i++)
+   for (i = 0; i < num; i++)  // 15 png.c:3990
    {
-      png_uint_16p sub_table = table[i] =
+      png_uint_16p sub_table = table[i] =  // 19 png.c:3992
           (png_uint_16p)png_malloc(png_ptr, 256 * (sizeof (png_uint_16)));
 
       /* The 'threshold' test is repeated here because it can arise for one of
@@ -4014,8 +4014,8 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
                /* See png_gamma_8bit_correct for why the cast to (int) is
                 * required here.
                 */
-               double d = floor(65535.*pow(ig*fmax, gamma_val*.00001)+.5);
-               sub_table[j] = (png_uint_16)d;
+               double d = floor(65535.*pow(ig*fmax, gamma_val*.00001)+.5);  // 16 png.c:4017
+               sub_table[j] = (png_uint_16)d;  // 17 png.c:4018
 #           else
                if (shift != 0)
                   ig = (ig * 65535U + max_by_2)/max;
@@ -4029,14 +4029,14 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
          /* We must still build a table, but do it the fast way. */
          unsigned int j;
 
-         for (j = 0; j < 256; j++)
+         for (j = 0; j < 256; j++)  // 15 png.c:4032
          {
-            png_uint_32 ig = (j << (8-shift)) + i;
+            png_uint_32 ig = (j << (8-shift)) + i;  // 16 png.c:4034
 
             if (shift != 0)
-               ig = (ig * 65535U + max_by_2)/max;
+               ig = (ig * 65535U + max_by_2)/max;  // 16 png.c:4037
 
-            sub_table[j] = (png_uint_16)ig;
+            sub_table[j] = (png_uint_16)ig;  // 17 png.c:4039
          }
       }
    }
@@ -4049,12 +4049,12 @@ static void
 png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
     unsigned int shift, png_fixed_point gamma_val)
 {
-   unsigned int num = 1U << (8U - shift);
+   unsigned int num = 1U << (8U - shift);  // 12 png.c:4052  // 18 png.c:4052  // 15 png.c:4052
    unsigned int max = (1U << (16U - shift))-1U;
    unsigned int i;
    png_uint_32 last;
 
-   png_uint_16pp table = *ptable =
+   png_uint_16pp table = *ptable =  // 13 png.c:4057  // 19 png.c:4057  // 16 png.c:4057
        (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
 
    /* 'num' is the number of tables and also the number of low bits of low
@@ -4062,7 +4062,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
     * itself indexed by the high 8 bits of the value.
     */
    for (i = 0; i < num; i++)
-      table[i] = (png_uint_16p)png_malloc(png_ptr,
+      table[i] = (png_uint_16p)png_malloc(png_ptr,  // 19 png.c:4065
           256 * (sizeof (png_uint_16)));
 
    /* 'gamma_val' is set to the reciprocal of the value calculated above, so
@@ -4082,20 +4082,20 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
     * table entries <= 'max'
     */
    last = 0;
-   for (i = 0; i < 255; ++i) /* 8-bit output value */
+   for (i = 0; i < 255; ++i) /* 8-bit output value */  // 15 png.c:4085
    {
       /* Find the corresponding maximum input value */
-      png_uint_16 out = (png_uint_16)(i * 257U); /* 16-bit output value */
+      png_uint_16 out = (png_uint_16)(i * 257U); /* 16-bit output value */  // 16 png.c:4088
 
       /* Find the boundary value in 16 bits: */
-      png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma_val);
+      png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma_val);  // 15 png.c:4091
 
       /* Adjust (round) to (16-shift) bits: */
       bound = (bound * max + 32768U)/65535U + 1U;
 
       while (last < bound)
       {
-         table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
+         table[last & (0xffU >> shift)][last >> (8U - shift)] = out;  // 17 png.c:4098
          last++;
       }
    }
@@ -4103,7 +4103,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
    /* And fill in the final entries. */
    while (last < (num << 8))
    {
-      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;
+      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;  // 17 png.c:4106
       last++;
    }
 }
@@ -4118,15 +4118,15 @@ png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
     png_fixed_point gamma_val)
 {
    unsigned int i;
-   png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);
+   png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);  // 14 png.c:4121  // 17 png.c:4121
 
    if (png_gamma_significant(gamma_val) != 0)
-      for (i=0; i<256; i++)
-         table[i] = png_gamma_8bit_correct(i, gamma_val);
+      for (i=0; i<256; i++)  // 18 png.c:4124
+         table[i] = png_gamma_8bit_correct(i, gamma_val);  // 19 png.c:4125
 
    else
-      for (i=0; i<256; ++i)
-         table[i] = (png_byte)(i & 0xff);
+      for (i=0; i<256; ++i)  // 18 png.c:4128
+         table[i] = (png_byte)(i & 0xff);  // 19 png.c:4129
 }
 
 /* Used from png_read_destroy and below to release the memory used by the gamma
@@ -4238,16 +4238,16 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 
       if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
       {
-         sig_bit = png_ptr->sig_bit.red;
+         sig_bit = png_ptr->sig_bit.red;  // 13 png.c:4241  // 15 png.c:4241
 
          if (png_ptr->sig_bit.green > sig_bit)
-            sig_bit = png_ptr->sig_bit.green;
+            sig_bit = png_ptr->sig_bit.green;  // 13 png.c:4244  // 15 png.c:4244
 
          if (png_ptr->sig_bit.blue > sig_bit)
-            sig_bit = png_ptr->sig_bit.blue;
+            sig_bit = png_ptr->sig_bit.blue;  // 13 png.c:4247  // 15 png.c:4247
       }
       else
-         sig_bit = png_ptr->sig_bit.gray;
+         sig_bit = png_ptr->sig_bit.gray;  // 13 png.c:4250  // 15 png.c:4250
 
       /* 16-bit gamma code uses this equation:
        *
@@ -4269,10 +4269,10 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
        */
       if (sig_bit > 0 && sig_bit < 16U)
          /* shift == insignificant bits */
-         shift = (png_byte)((16U - sig_bit) & 0xff);
+         shift = (png_byte)((16U - sig_bit) & 0xff);  // 14 png.c:4272  // 16 png.c:4272
 
       else
-         shift = 0; /* keep all 16 bits */
+         shift = 0; /* keep all 16 bits */  // 14 png.c:4275  // 16 png.c:4275
 
       if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) != 0)
       {
@@ -4281,11 +4281,11 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
           * eventually be 8 bits.  By default it is 11.
           */
          if (shift < (16U - PNG_MAX_GAMMA_8))
-            shift = (16U - PNG_MAX_GAMMA_8);
+            shift = (16U - PNG_MAX_GAMMA_8);  // 14 png.c:4284  // 16 png.c:4284
       }
 
       if (shift > 8U)
-         shift = 8U; /* Guarantees at least one table! */
+         shift = 8U; /* Guarantees at least one table! */  // 14 png.c:4288  // 16 png.c:4288
 
       png_ptr->gamma_shift = shift;
 
@@ -4295,12 +4295,12 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
        * reduced to 8 bits.
        */
       if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) != 0)
-          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
+          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,  // 11 png.c:4298  // 17 png.c:4298  // 14 png.c:4298
           png_ptr->screen_gamma > 0 ? png_product2(png_ptr->colorspace.gamma,
           png_ptr->screen_gamma) : PNG_FP_1);
 
       else
-          png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
+          png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,  // 15 png.c:4303  // 17 png.c:4303
           png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->colorspace.gamma,
           png_ptr->screen_gamma) : PNG_FP_1);
 
@@ -4309,14 +4309,14 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
       if ((png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY)) != 0)
       {
-         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
+         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,  // 15 png.c:4312  // 17 png.c:4312
              png_reciprocal(png_ptr->colorspace.gamma));
 
          /* Notice that the '16 from 1' table should be full precision, however
           * the lookup on this table still uses gamma_shift, so it can't be.
           * TODO: fix this.
           */
-         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_from_1, shift,
+         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_from_1, shift,  // 15 png.c:4319  // 17 png.c:4319
              png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
              png_ptr->colorspace.gamma/* Probably doing rgb_to_gray */);
       }

@@ -274,7 +274,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i++)
       {
-         *rp = (png_byte)(~(*rp));
+         *rp = (png_byte)(~(*rp));  // 19 pngtrans.c:277
          rp++;
       }
    }
@@ -288,7 +288,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i += 2)
       {
-         *rp = (png_byte)(~(*rp));
+         *rp = (png_byte)(~(*rp));  // 19 pngtrans.c:291
          rp += 2;
       }
    }
@@ -303,8 +303,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i += 4)
       {
-         *rp = (png_byte)(~(*rp));
-         *(rp + 1) = (png_byte)(~(*(rp + 1)));
+         *rp = (png_byte)(~(*rp));  // 18 pngtrans.c:306
+         *(rp + 1) = (png_byte)(~(*(rp + 1)));  // 19 pngtrans.c:307
          rp += 4;
       }
    }
@@ -334,9 +334,9 @@ png_do_swap(png_row_infop row_info, png_bytep row)
           */
          *(png_uint_16*)rp = __builtin_bswap16(*(png_uint_16*)rp);
 #else
-         png_byte t = *rp;
-         *rp = *(rp + 1);
-         *(rp + 1) = t;
+         png_byte t = *rp;  // 18 pngtrans.c:337
+         *rp = *(rp + 1);  // 18 pngtrans.c:338
+         *(rp + 1) = t;  // 19 pngtrans.c:339
 #endif
       }
    }
@@ -345,7 +345,7 @@ png_do_swap(png_row_infop row_info, png_bytep row)
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
-static const png_byte onebppswaptable[256] = {
+static const png_byte onebppswaptable[256] = {  // 18 pngtrans.c:348
    0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0,
    0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
    0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8,
@@ -380,7 +380,7 @@ static const png_byte onebppswaptable[256] = {
    0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
 
-static const png_byte twobppswaptable[256] = {
+static const png_byte twobppswaptable[256] = {  // 18 pngtrans.c:383
    0x00, 0x40, 0x80, 0xC0, 0x10, 0x50, 0x90, 0xD0,
    0x20, 0x60, 0xA0, 0xE0, 0x30, 0x70, 0xB0, 0xF0,
    0x04, 0x44, 0x84, 0xC4, 0x14, 0x54, 0x94, 0xD4,
@@ -415,7 +415,7 @@ static const png_byte twobppswaptable[256] = {
    0x2F, 0x6F, 0xAF, 0xEF, 0x3F, 0x7F, 0xBF, 0xFF
 };
 
-static const png_byte fourbppswaptable[256] = {
+static const png_byte fourbppswaptable[256] = {  // 18 pngtrans.c:418
    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
    0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
    0x01, 0x11, 0x21, 0x31, 0x41, 0x51, 0x61, 0x71,
@@ -476,7 +476,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
          return;
 
       for (rp = row; rp < end; rp++)
-         *rp = table[*rp];
+         *rp = table[*rp];  // 19 pngtrans.c:479
    }
 }
 #endif /* PACKSWAP || WRITE_PACKSWAP */
@@ -521,10 +521,10 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
          /* For a 1 pixel wide image there is nothing to do */
          while (sp < ep)
          {
-            *dp++ = *sp; sp += 2;
+            *dp++ = *sp; sp += 2;  // 19 pngtrans.c:524
          }
 
-         row_info->pixel_depth = 8;
+         row_info->pixel_depth = 8;  // 17 pngtrans.c:527  // 15 pngtrans.c:527
       }
 
       else if (row_info->bit_depth == 16)
@@ -538,16 +538,16 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
 
          while (sp < ep)
          {
-            *dp++ = *sp++; *dp++ = *sp; sp += 3;
+            *dp++ = *sp++; *dp++ = *sp; sp += 3;  // 19 pngtrans.c:541
          }
 
-         row_info->pixel_depth = 16;
+         row_info->pixel_depth = 16;  // 17 pngtrans.c:544  // 15 pngtrans.c:544
       }
 
       else
          return; /* bad bit depth */
 
-      row_info->channels = 1;
+      row_info->channels = 1;  // 16 pngtrans.c:550  // 14 pngtrans.c:550
 
       /* Finally fix the color type if it records an alpha channel */
       if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -569,10 +569,10 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
          /* Note that the loop adds 3 to dp and 4 to sp each time. */
          while (sp < ep)
          {
-            *dp++ = *sp++; *dp++ = *sp++; *dp++ = *sp; sp += 2;
+            *dp++ = *sp++; *dp++ = *sp++; *dp++ = *sp; sp += 2;  // 19 pngtrans.c:572
          }
 
-         row_info->pixel_depth = 24;
+         row_info->pixel_depth = 24;  // 17 pngtrans.c:575  // 15 pngtrans.c:575
       }
 
       else if (row_info->bit_depth == 16)
@@ -587,18 +587,18 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
          while (sp < ep)
          {
             /* Copy 6 bytes, skip 2 */
-            *dp++ = *sp++; *dp++ = *sp++;
-            *dp++ = *sp++; *dp++ = *sp++;
-            *dp++ = *sp++; *dp++ = *sp; sp += 3;
+            *dp++ = *sp++; *dp++ = *sp++;  // 17 pngtrans.c:590
+            *dp++ = *sp++; *dp++ = *sp++;  // 18 pngtrans.c:591
+            *dp++ = *sp++; *dp++ = *sp; sp += 3;  // 19 pngtrans.c:592
          }
 
-         row_info->pixel_depth = 48;
+         row_info->pixel_depth = 48;  // 17 pngtrans.c:595  // 15 pngtrans.c:595
       }
 
       else
          return; /* bad bit depth */
 
-      row_info->channels = 3;
+      row_info->channels = 3;  // 16 pngtrans.c:601  // 14 pngtrans.c:601
 
       /* Finally fix the color type if it records an alpha channel */
       if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
@@ -632,9 +632,9 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
             for (i = 0, rp = row; i < row_width; i++, rp += 3)
             {
-               png_byte save = *rp;
-               *rp = *(rp + 2);
-               *(rp + 2) = save;
+               png_byte save = *rp;  // 18 pngtrans.c:635
+               *rp = *(rp + 2);  // 18 pngtrans.c:636
+               *(rp + 2) = save;  // 19 pngtrans.c:637
             }
          }
 
@@ -645,9 +645,9 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
             for (i = 0, rp = row; i < row_width; i++, rp += 4)
             {
-               png_byte save = *rp;
-               *rp = *(rp + 2);
-               *(rp + 2) = save;
+               png_byte save = *rp;  // 18 pngtrans.c:648
+               *rp = *(rp + 2);  // 18 pngtrans.c:649
+               *(rp + 2) = save;  // 19 pngtrans.c:650
             }
          }
       }
@@ -662,12 +662,12 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
             for (i = 0, rp = row; i < row_width; i++, rp += 6)
             {
-               png_byte save = *rp;
-               *rp = *(rp + 4);
-               *(rp + 4) = save;
-               save = *(rp + 1);
-               *(rp + 1) = *(rp + 5);
-               *(rp + 5) = save;
+               png_byte save = *rp;  // 16 pngtrans.c:665
+               *rp = *(rp + 4);  // 16 pngtrans.c:666
+               *(rp + 4) = save;  // 17 pngtrans.c:667
+               save = *(rp + 1);  // 18 pngtrans.c:668
+               *(rp + 1) = *(rp + 5);  // 18 pngtrans.c:669
+               *(rp + 5) = save;  // 19 pngtrans.c:670
             }
          }
 
@@ -678,12 +678,12 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 
             for (i = 0, rp = row; i < row_width; i++, rp += 8)
             {
-               png_byte save = *rp;
-               *rp = *(rp + 4);
-               *(rp + 4) = save;
-               save = *(rp + 1);
-               *(rp + 1) = *(rp + 5);
-               *(rp + 5) = save;
+               png_byte save = *rp;  // 16 pngtrans.c:681
+               *rp = *(rp + 4);  // 16 pngtrans.c:682
+               *(rp + 4) = save;  // 17 pngtrans.c:683
+               save = *(rp + 1);  // 18 pngtrans.c:684
+               *(rp + 1) = *(rp + 5);  // 18 pngtrans.c:685
+               *(rp + 5) = save;  // 19 pngtrans.c:686
             }
          }
       }
