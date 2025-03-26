@@ -388,7 +388,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 
 expr_moran[0] = (png_ptr == NULL), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(201, 5, 0, low_moran, high_moran, expr_moran, 0);
+   // mdafl_gc_log(201, 5, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
       return;
 
@@ -463,18 +463,18 @@ expr_moran[0] = (png_ptr == NULL), low_moran[0] = -1, high_moran[0] = -1;
    {
 expr_moran[0] = png_ptr->pass == 0, low_moran[0] = -1, high_moran[0] = -1;
       expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-      mdafl_gc_log(203, 3, 1, low_moran, high_moran, expr_moran, 0);
+      // mdafl_gc_log(203, 3, 1, low_moran, high_moran, expr_moran, 0);
       switch(png_ptr->pass)
       {
          case 0:
 expr_moran[0] = png_ptr->row_number & 0x07, low_moran[0] = -1, high_moran[0] = -1;
             expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-            mdafl_gc_log(204, 3, 1, low_moran, high_moran, expr_moran, 0);
+            // mdafl_gc_log(204, 3, 1, low_moran, high_moran, expr_moran, 0);
             if (expr_moran[0])
             {
 expr_moran[0] = (dsp_row != NULL), low_moran[0] = -1, high_moran[0] = -1;
                expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-               mdafl_gc_log(205, 1, 1, low_moran, high_moran, expr_moran, 0);
+               // mdafl_gc_log(205, 1, 1, low_moran, high_moran, expr_moran, 0);
                if (expr_moran[0])
                   png_combine_row(png_ptr, dsp_row, 1/*display*/);  // 19 pngread.c:465
                png_read_finish_row(png_ptr);  // 6 pngread.c:466  // 5 pngread.c:466
@@ -551,7 +551,7 @@ expr_moran[0] = (dsp_row != NULL), low_moran[0] = -1, high_moran[0] = -1;
 
 expr_moran[0] = ((png_ptr->mode & PNG_HAVE_IDAT) == 0), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(202, 2, 0, low_moran, high_moran, expr_moran, 0);
+   // mdafl_gc_log(202, 2, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
       png_error(png_ptr, "Invalid attempt to read row data");
 
@@ -790,7 +790,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 
 expr_moran[0] = (png_ptr == NULL), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-mdafl_gc_log(201, 3, 0, low_moran, high_moran, expr_moran, 0);
+// mdafl_gc_log(201, 3, 0, low_moran, high_moran, expr_moran, 0);
 if (expr_moran[0])
       return;
 
@@ -800,7 +800,7 @@ if (expr_moran[0])
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 expr_moran[0] = (png_chunk_unknown_handling(png_ptr, png_IDAT) == 0), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(202, 2, 1, low_moran, high_moran, expr_moran, 0);
+   // mdafl_gc_log(202, 2, 1, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
 #endif
       png_read_finish_IDAT(png_ptr);  // 7 pngread.c:783  // 6 pngread.c:783

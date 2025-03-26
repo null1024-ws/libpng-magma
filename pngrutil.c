@@ -946,7 +946,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
 expr_moran[0] = ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 0);
+//    // mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
@@ -957,7 +957,7 @@ expr_moran[0] = ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0), low_moran[0
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
 expr_moran[0] = (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 0);
+//    // mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
@@ -967,7 +967,7 @@ expr_moran[0] = (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE), low_moran[0] = 
 
 expr_moran[0] = length > 3 * PNG_MAX_PALETTE_LENGTH || length % 3, low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(303, 1, 0, low_moran, high_moran, expr_moran, 0);
+//    // mdafl_gc_log(303, 1, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       png_crc_finish(png_ptr, length);
@@ -3172,7 +3172,7 @@ png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
 # endif
 expr_moran[0] = (png_ptr->chunk_name == png_IDAT), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
+//    // mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       png_alloc_size_t idat_limit = PNG_UINT_31_MAX;
@@ -3277,13 +3277,13 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
        */
 expr_moran[0] = row_width, low_moran[0] = DBL_MIN, high_moran[0] = PNG_PASS_START_COL(pass);
       expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 1);
+// // mdafl_gc_log(301, 1, 0, low_moran, high_moran, expr_moran, 1);
 if (expr_moran[0] <= high_moran[0])
          return;
 
 expr_moran[0] = pixel_depth, low_moran[0] = DBL_MIN, high_moran[0] = 8;
       expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-      mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 1);
+//       // mdafl_gc_log(302, 1, 0, low_moran, high_moran, expr_moran, 1);
       if (expr_moran[0] < high_moran[0])
       {
          /* For pixel depths up to 4 bpp the 8-pixel mask can be expanded to fit
@@ -4180,7 +4180,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
 
 expr_moran[0] = (png_ptr->zstream.avail_in == 0), low_moran[0] = -1, high_moran[0] = -1;
       expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-      mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
+//       // mdafl_gc_log(501, 1, 1, low_moran, high_moran, expr_moran, 0);
       if (expr_moran[0])
       {
          uInt avail_in;
@@ -4188,7 +4188,7 @@ expr_moran[0] = (png_ptr->zstream.avail_in == 0), low_moran[0] = -1, high_moran[
 
 expr_moran[0] = png_ptr->idat_size == 0, low_moran[0] = -1, high_moran[0] = -1;
          expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-         mdafl_gc_log(502, 1, 1, low_moran, high_moran, expr_moran, 0);
+//          mdafl_gc_log(502, 1, 1, low_moran, high_moran, expr_moran, 0);
          while (png_ptr->idat_size == 0)
          {
             png_crc_finish(png_ptr, 0);
@@ -4307,7 +4307,7 @@ png_read_finish_IDAT(png_structrp png_ptr)
     */
 expr_moran[0] = ((png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(401, 2, 1, low_moran, high_moran, expr_moran, 0);
+//    mdafl_gc_log(401, 2, 1, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       /* The NULL causes png_read_IDAT_data to swallow any remaining bytes in
@@ -4369,13 +4369,13 @@ png_read_finish_row(png_structrp png_ptr)
    png_ptr->row_number++;
 expr_moran[0] = png_ptr->row_number, low_moran[0] = DBL_MIN, high_moran[0] = png_ptr->num_rows;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-mdafl_gc_log(301, 2, 0, low_moran, high_moran, expr_moran, 1);
+// mdafl_gc_log(301, 2, 0, low_moran, high_moran, expr_moran, 1);
 if (expr_moran[0] < high_moran[0])
       return;
 
 expr_moran[0] = (png_ptr->interlaced != 0), low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(302, 2, 0, low_moran, high_moran, expr_moran, 0);
+//    mdafl_gc_log(302, 2, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
    {
       png_ptr->row_number = 0;
@@ -4412,7 +4412,7 @@ expr_moran[0] = (png_ptr->interlaced != 0), low_moran[0] = -1, high_moran[0] = -
 
 expr_moran[0] = png_ptr->pass, low_moran[0] = DBL_MIN, high_moran[0] = 7;
       expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-      mdafl_gc_log(303, 2, 0, low_moran, high_moran, expr_moran, 1);
+//       mdafl_gc_log(303, 2, 0, low_moran, high_moran, expr_moran, 1);
       if (expr_moran[0] < high_moran[0])
          return;
    }

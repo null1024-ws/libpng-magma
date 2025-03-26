@@ -581,7 +581,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
 
 expr_moran[0] = png_ptr == NULL || info_ptr == NULL, low_moran[0] = -1, high_moran[0] = -1;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(401, 1, 0, low_moran, high_moran, expr_moran, 0);
+//    mdafl_gc_log(401, 1, 0, low_moran, high_moran, expr_moran, 0);
    if (expr_moran[0])
       return;
 
@@ -629,7 +629,7 @@ expr_moran[0] = png_ptr == NULL || info_ptr == NULL, low_moran[0] = -1, high_mor
 
 expr_moran[0] = num_palette, low_moran[0] = 0, high_moran[0] = DBL_MAX;
    expr_moran[1] = -1, low_moran[1] = -1, high_moran[1] = -1;
-   mdafl_gc_log(402, 1, 1, low_moran, high_moran, expr_moran, 1);
+//    mdafl_gc_log(402, 1, 1, low_moran, high_moran, expr_moran, 1);
    if (expr_moran[0] > low_moran[0])
       memcpy(png_ptr->palette, palette, (unsigned int)num_palette *  // 19 pngset.c:626  // 23 pngset.c:626
           (sizeof (png_color)));
